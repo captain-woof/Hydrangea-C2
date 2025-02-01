@@ -1,6 +1,8 @@
 import asyncio
 import websockets
 from argparse import ArgumentParser
+import help
+
 
 # Define command line args
 parser = ArgumentParser(description="Starts Hydrangea C2 client")
@@ -23,10 +25,45 @@ async def runClient():
 
             # Start client loop
             while True:
-                await websocket.send(input(f"Tasker ({args.host}:{args.port}) > "))
+                userInput = input(f"{username}@Tasker ({args.host}:{args.port}) > ")
 
-                response = await websocket.recv()
-                print(response)
+                # Handle admin functions
+                if userInput == "context admin":
+                    while True:
+                        userInput = input(f"{username}@Tasker ({args.host}:{args.port}) > Admin > ")
+
+                        # Print 'context admin' Help
+                        if userInput == "help":
+                            print(help.HELP_CONTEXT_ADMIN)
+
+                        # Go back from 'context admin'
+                        elif userInput in ["back", "quit", "exit"]:
+                            break
+
+                        # Send command to server
+                        else:
+                            await websocket.send(userInput)
+                            response = await websocket.recv()
+                            print(response)
+
+                # Handle quit to exit client
+                elif userInput in ["quit", "exit"]:
+                    await websocket.send("quit")
+                    response = await websocket.recv()
+                    print(response)
+                    break
+
+                # Print 'main menu' help
+                elif userInput == "help":
+                    print(help.HELP_MAIN_MENU)
+
+                # Handle listener function TODO
+
+                # Handle payload function TODO
+
+                # Wrong command
+                else:
+                    print("ERROR: Wrong command")
 
     except ConnectionRefusedError:
         print("ERROR: Failed to connect with server. Is server running?")
