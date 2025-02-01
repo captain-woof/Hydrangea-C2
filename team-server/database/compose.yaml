@@ -1,0 +1,25 @@
+services:
+  mysql:
+    image: mysql:9.2.0
+    restart: always
+    container_name: hydrangea-mysql
+    volumes:
+      - hydrangea-mysql:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - 3306:3306
+    env_file:
+      - "../.env"
+    networks:
+      - hydrangea-local
+
+volumes:
+  hydrangea-mysql:
+    name: hydrangea-mysql
+
+networks:
+  hydrangea-local:
+    name: hydrangea-local
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
