@@ -52,30 +52,45 @@ async def startCommunication(websocket: WebSocket):
 
             ## Administrator commands
             if userInput.startswith("newuser"): # newuser USERNAME PASSWORD ROLE
+                if user.role != "admin":
+                    await websocket.send_text(f"ERROR: You are not an admin")
+                    continue
                 result = adminFunc.createUser(db=db, username=userInputSplit[1], password=userInputSplit[2], role=userInputSplit[3])
                 if result:
                     await websocket.send_text(f"SUCCESS: User {userInputSplit[1]}({userInputSplit[3]}) created successfully")
                 else:
                     await websocket.send_text(f"ERROR: User {userInputSplit[1]}({userInputSplit[3]}) could not be created")
             elif userInput.startswith("editusername"): # editusername USERNAME NEW_USERNAME
+                if user.role != "admin":
+                    await websocket.send_text(f"ERROR: You are not an admin")
+                    continue
                 result = adminFunc.editUser(db=db, username=userInputSplit[1], changeWhat="username", newValue=userInputSplit[2])
                 if result:
                     await websocket.send_text(f"SUCCESS: User {userInputSplit[1]}'s new username set to '{userInputSplit[2]}'")
                 else:
                     await websocket.send_text(f"ERROR: Failed to change user {userInputSplit[1]}'s new username to '{userInputSplit[2]}'")
             elif userInput.startswith("editpassword"): # editpassword USERNAME NEW_PASSWORD
+                if user.role != "admin":
+                    await websocket.send_text(f"ERROR: You are not an admin")
+                    continue
                 result = adminFunc.editUser(db=db, username=userInputSplit[1], changeWhat="password", newValue=userInputSplit[2])
                 if result:
                     await websocket.send_text(f"SUCCESS: User {userInputSplit[1]}'s new password set")
                 else:
                     await websocket.send_text(f"ERROR: Failed to change user {userInputSplit[1]}'s new password")
             elif userInput.startswith("editrole"): # editrole USERNAME NEW_ROLE
+                if user.role != "admin":
+                    await websocket.send_text(f"ERROR: You are not an admin")
+                    continue
                 result = adminFunc.editUser(db=db, username=userInputSplit[1], changeWhat="role", newValue=userInputSplit[2])
                 if result:
                     await websocket.send_text(f"SUCCESS: User {userInputSplit[1]}'s new role set to '{userInputSplit[2]}'")
                 else:
                     await websocket.send_text(f"ERROR: Failed to change user {userInputSplit[1]}'s new role to '{userInputSplit[2]}'")
             elif userInput.startswith("deluser"): # deluser USERNAME
+                if user.role != "admin":
+                    await websocket.send_text(f"ERROR: You are not an admin")
+                    continue
                 result = adminFunc.deleteUser(db=db, username=userInputSplit[1])
                 if result:
                     await websocket.send_text(f"SUCCESS: User '{userInputSplit[1]}' deleted")
