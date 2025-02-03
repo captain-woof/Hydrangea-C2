@@ -55,7 +55,7 @@ def handleAdminCommand(db: HydrangeaDatabase, socketClient: socket.socket, user,
 
             # Edit user's role
             elif userInput.startswith("editrole"): # editrole USERNAME NEW_ROLE
-                if userInputSplit[3] not in ["admin", "operator", "observer"]:
+                if userInputSplit[2] not in ["admin", "operator", "observer"]:
                     socketClient.sendall(b"ERROR: Incorrect role")
                 else:
                     if db.changeUserRole(username=userInputSplit[1], roleNew=userInputSplit[2]):
