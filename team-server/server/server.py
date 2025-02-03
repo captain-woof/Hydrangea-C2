@@ -54,7 +54,10 @@ class TeamServer():
         # Start client handling loop
         while True:
             # Receive all user data
-            userInput = socketClient.recvall().decode("utf-8")
+            userInputRaw = socketClient.recvall()
+            if userInputRaw is None:
+                continue
+            userInput = userInputRaw.decode("utf-8")
 
             # Quit
             if userInput in ["quit", "exit"]: # User wants to quit
