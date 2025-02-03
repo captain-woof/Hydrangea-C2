@@ -2,9 +2,9 @@
 
 ## Components
 
-### Tasker
+### Team server
 
-Tasker (`tasker/main.py`) is part of team-server, and its job is to mediate between listeners and clients. Clients can task agents via Tasker.
+Team server (`team-server/main.py`) mediates between agents, listeners and clients.
 
 ### Client
 
@@ -12,7 +12,11 @@ Client (`client/main.py`) is the client to use to connect to Tasker.
 
 ### Listener
 
-Listeners (`listeners/*.py`) are scripts that start a server, intended to receive communication from agents. They are part of team server since they are started on team server.
+Listeners (`team-server/listeners/*.py`) are scripts that start a server, intended to receive communication from agents. They are part of team server since they are started on team server.
+
+### Database
+
+There's a MySQL database in `team-server/database` that needs to be setup with docker. This database stores all necessary persistent information.
 
 ## Team server guide
 
@@ -32,19 +36,28 @@ docker compose up -f ./database/compose.yaml -d # starts MySQL in a docker and p
 
 This starts a local (`127.0.0.1:3306`) MySQL database, with your chosen username and password in `.env`. Use this if you need to manually interact with the database.
 
-### Starting Tasker
+### Starting team server
 
 ```bash
-fastapi run --host 127.0.0.1 --port 6060 ./tasker/main.py
+python3 -m virtualenv venv
+source ./venv/bin/activate
+
+python3 ./main.py -H 127.0.0.1 -P 6060
 ```
 
-### Stopping
+### Stopping team server
 
 ```bash
-docker compose down # stops MySQL container
+Ctrl + C # yes, just interrupt
 ```
 
-### Removing
+### Stopping MySQL database
+
+```bash
+docker compose down -f ./database/compose.yaml -d
+```
+
+### Removing MySQL volume
 
 ```bash
 sudo docker volume rm team-server_hydrangea-mysql # remove MySQL's docker volume
@@ -52,10 +65,12 @@ sudo docker volume rm team-server_hydrangea-mysql # remove MySQL's docker volume
 
 ## Client guide
 
+**Note: All client stuff is in `client/` directory. Unless otherwise stated, use this folder as your current directory when starting the client.**
+
 ### Starting client
 
 ```bash
-python3 ./client/main.py -H 127.0.0.1 -P 6060
+python3 ./main.py -H 127.0.0.1 -P 6060
 ```
 
 At any point, invoke `help` command to see available commands. These commands are also listed below.
@@ -73,6 +88,8 @@ USER@Tasker (xx.xx.xx.xx:xx) > context admin
 ```
 USER@Tasker (xx.xx.xx.xx:xx) > Admin > newuser USERNAME PASSWORD ROLE
 ```
+
+*Remember: Usernames are unique*
 
 **Edit existing user's username**
 

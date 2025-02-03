@@ -1,57 +1,75 @@
-import asyncio
-import websockets
 from argparse import ArgumentParser
 import help
+from socket_custom import SocketCustom
 
+########
+# CLIENT
+########
 
-# Define command line args
-parser = ArgumentParser(description="Starts Hydrangea C2 client")
-parser.add_argument("-H", "--host", action="store", default="127.0.0.1", help="Hydrangea C2's team server hostname/IP; default: 127.0.0.1")
-parser.add_argument("-P", "--port", action="store", default="6060", help="Hydrangea C2's team server port; default: 6060")
-args = parser.parse_args()
+class Client():
+    #########
+    # MEMBERS
+    #########
+    host: str
+    port: int
+    socketClient: SocketCustom
 
-# Client entrypoint
-async def runClient():
-    try:
-        async with websockets.connect(f"ws://{args.host}:{args.port}/ws") as websocket:
+    ###########
+    # FUNCTIONS
+    ###########
+
+    def __init__(self, host: str, port: int):
+        self.host = host
+        self.port = port
+
+    def exit(self, errorCode = 0):
+        self.socketClient.close()
+        exit(errorCode)
+
+    def start(self):
+        try:
+            # Connect to team server
+            self.socketClient = SocketCustom()
+            self.socketClient.connect((host, port))
+            print(f"SUCCESS: Connected to team server {self.host}:{self.port}")
+
             # Authenticate
             username = input("Username: ")
             password = input("Password: ")
-            await websocket.send(username.encode("utf-8") + b"\x00" + password.encode("utf-8"))
-            authResponse = await websocket.recv()
+            self.socketClient.sendall(username.encode("utf-8") + b"\x00" + password.encode("utf-8"))
+            authResponse = self.socketClient.recvall().decode("utf-8")
             print(authResponse)
             if authResponse.startswith("ERROR:"):
-                return
+                self.exit()
 
             # Start client loop
             while True:
-                userInput = input(f"{username}@Tasker ({args.host}:{args.port}) > ")
+                # Take client input
+                userInput = input(f"{username}@Tasker ({self.host}:{self.port}) > ")
 
                 # Handle admin functions
                 if userInput == "context admin":
+                    # Admin functions loop
                     while True:
-                        userInput = input(f"{username}@Tasker ({args.host}:{args.port}) > Admin > ")
-
+                        userInput = input(f"{username}@Tasker ({self.host}:{self.port}) > Admin > ")
                         # Print 'context admin' Help
                         if userInput == "help":
                             print(help.HELP_CONTEXT_ADMIN)
-
                         # Go back from 'context admin'
                         elif userInput in ["back", "quit", "exit"]:
                             break
-
                         # Send command to server
                         else:
-                            await websocket.send(userInput)
-                            response = await websocket.recv()
+                            self.socketClient.sendall(userInput.encode("utf-8"))
+                            response = self.socketClient.recvall().decode("utf-8")
                             print(response)
 
                 # Handle quit to exit client
                 elif userInput in ["quit", "exit"]:
-                    await websocket.send("quit")
-                    response = await websocket.recv()
+                    self.socketClient.sendall(b"quit")
+                    response = self.socketClient.recvall().decode("utf-8")
                     print(response)
-                    break
+                    self.exit()
 
                 # Print 'main menu' help
                 elif userInput == "help":
@@ -64,13 +82,26 @@ async def runClient():
                 # Wrong command
                 else:
                     print("ERROR: Wrong command")
+        except ConnectionRefusedError:
+            print("ERROR: Failed to connect with server. Is server running?")
 
-    except ConnectionRefusedError:
-        print("ERROR: Failed to connect with server. Is server running?")
+        except KeyboardInterrupt:
+            print("SUCCESS: Quit")
 
-    except KeyboardInterrupt:
-        print("SUCCESS: Quit")
+########
+# MAIN
+########
 
-# Run client
 if __name__ == "__main__":
-    asyncio.run(runClient())
+    # Define command line args
+    parser = ArgumentParser(description="Starts Hydrangea C2 client")
+    parser.add_argument("-H", "--host", action="store", default="127.0.0.1", help="Hydrangea C2's team server hostname/IP; default: 127.0.0.1")
+    parser.add_argument("-P", "--port", action="store", type=int, default=6060, help="Hydrangea C2's team server port; default: 6060")
+    args = parser.parse_args()
+
+    host = args.host
+    port = args.port
+
+    # Start client
+    client = Client(host=host, port=port)
+    client.start()
