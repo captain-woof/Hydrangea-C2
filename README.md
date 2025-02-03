@@ -8,7 +8,7 @@ Team server (`team-server/main.py`) mediates between agents, listeners and clien
 
 ### Client
 
-Client (`client/main.py`) is the client to use to connect to Tasker.
+Client (`client/main.py`) is the client to use to connect to Team server.
 
 ### Listener
 
@@ -80,13 +80,13 @@ At any point, invoke `help` command to see available commands. These commands ar
 Enter the `admin` context with below command first:
 
 ```
-USER@Tasker (xx.xx.xx.xx:xx) > context admin
+USER@xx.xx.xx.xx:xx > context admin
 ```
 
 **Create new user**
 
 ```
-USER@Tasker (xx.xx.xx.xx:xx) > Admin > newuser USERNAME PASSWORD ROLE
+USER@xx.xx.xx.xx:xx > Admin > newuser USERNAME PASSWORD ROLE
 ```
 
 *Remember: Usernames are unique*
@@ -94,25 +94,25 @@ USER@Tasker (xx.xx.xx.xx:xx) > Admin > newuser USERNAME PASSWORD ROLE
 **Edit existing user's username**
 
 ```
-USER@Tasker (xx.xx.xx.xx:xx) > Admin > editusername USERNAME NEW_USERNAME
+USER@xx.xx.xx.xx:xx > Admin > editusername USERNAME NEW_USERNAME
 ```
 
 **Edit existing user's password**
 
 ```
-USER@Tasker (xx.xx.xx.xx:xx) > Admin > editpassword USERNAME NEW_PASSWORD
+USER@xx.xx.xx.xx:xx > Admin > editpassword USERNAME NEW_PASSWORD
 ```
 
 **Edit existing user's role**
 
 ```
-USER@Tasker (xx.xx.xx.xx:xx) > Admin > editrole USERNAME NEW_ROLE
+USER@xx.xx.xx.xx:xx > Admin > editrole USERNAME NEW_ROLE
 ```
 
 **Delete existing user**
 
 ```
-USER@Tasker (xx.xx.xx.xx:xx) > Admin > deluser USERNAME
+USER@xx.xx.xx.xx:xx > Admin > deluser USERNAME
 ```
 
 ### Listener commands

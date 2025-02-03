@@ -45,13 +45,13 @@ class Client():
             # Start client loop
             while True:
                 # Take client input
-                userInput = input(f"{username}@Tasker ({self.host}:{self.port}) > ")
+                userInput = input(f"{username}@{self.host}:{self.port} > ")
 
                 # Handle admin functions
                 if userInput == "context admin":
                     # Admin functions loop
                     while True:
-                        userInput = input(f"{username}@Tasker ({self.host}:{self.port}) > Admin > ")
+                        userInput = input(f"{username}@{self.host}:{self.port} > Admin > ")
                         # Print 'context admin' Help
                         if userInput == "help":
                             print(help.HELP_CONTEXT_ADMIN)
