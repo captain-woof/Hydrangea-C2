@@ -3,6 +3,7 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
+import time
 
 # Load environment variables
 load_dotenv(".env")
@@ -41,7 +42,7 @@ class HydrangeaDatabase():
                 user = session.execute(
                     text("SELECT * FROM users WHERE username=:username"),
                     [{"username": username}]
-                )
+                ).first()
                 return user
         except SQLAlchemyError:
             return False
@@ -97,3 +98,84 @@ class HydrangeaDatabase():
             return True
         except SQLAlchemyError:
             return False
+        
+    # Create new task
+    def createNewTask(self, originClientId: str, agentId: str, task: str):
+        try:
+            with Session(db_engine) as session:
+                session.execute(
+                    text("INSERT INTO tasks(originClientId, agentId, task) VALUES(:originClientId, :agentId, :task)"),
+                    [{
+                        "originClientId": originClientId,
+                        "agentId": agentId,
+                        "task": task
+                    }]
+                )
+                session.commit()
+            return True
+        except SQLAlchemyError:
+            return False
+
+    # Get new tasks for particular agent. optionally such new tasks are updated with "taskedAt" timestamp, so that next call will NOT return these tasks
+    def getNewTasksForAgent(self, agentId: str, setTasked: bool = False):
+        try:
+            with Session(db_engine) as session:
+                tasks = session.execute(
+                    text("SELECT * FROM tasks WHERE agentId = :agentId AND taskedAt IS NULL"),
+                    [{
+                        "agentId": agentId
+                    }]
+                ).fetchall()
+
+                if setTasked:
+                    session.execute(
+                        text("UPDATE tasks SET taskedAt = :taskedAt WHERE agentId = :agentId AND taskedAt IS NULL"),
+                        [{
+                            "taskedAt": int(time.time()),
+                            "agentId": agentId
+                        }]
+                    )
+                    session.commit()
+
+                return tasks
+        except SQLAlchemyError:
+            return False
+        
+    # Get all tasks; optionally can filter by agent
+    def getTasks(self, agentId: str = None):
+        try:
+            with Session(db_engine) as session:
+                if agentId is not None:
+                    return session.execute(
+                        text("SELECT * FROM tasks WHERE agentId = :agentId"),
+                        [{
+                            "agentId": agentId
+                        }]
+                    ).fetchall()
+                else:
+                    return session.execute(
+                        text("SELECT * FROM tasks"),
+                        [{
+                            "agentId": agentId
+                        }]
+                    ).fetchall()
+        except SQLAlchemyError:
+            return False
+
+    # Set task output
+    def setTaskOutput(self, taskId: int, output: str):
+        try:
+            with Session(db_engine) as session:
+                session.execute(
+                    text("UPDATE tasks SET output = :output, outputAt = :outputAt WHERE id = :taskId"),
+                    [{
+                        "output": output,
+                        "outputAt": int(time.time()),
+                        "taskId": taskId
+                    }]
+                )
+                session.commit()
+            return True
+        except SQLAlchemyError:
+            return False
+

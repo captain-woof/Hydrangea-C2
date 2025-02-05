@@ -1,6 +1,6 @@
 import bcrypt
-import socket
 from database.database import HydrangeaDatabase
+from .socket_custom import SocketCustom
 
 # Constants
 ADMIN_COMMANDS_PREFIX = (
@@ -16,7 +16,7 @@ def hashPassword(password: str):
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 # Handles Administrative command and communicates result to client; returns False if the input command is not an Admin command
-def handleAdminCommand(db: HydrangeaDatabase, socketClient: socket.socket, user, userInput: str):
+def handleAdminCommand(db: HydrangeaDatabase, socketClient: SocketCustom, user, userInput: str):
     # If command is for Administration, handle here
     if userInput.startswith(ADMIN_COMMANDS_PREFIX):
         # Verify user's role; if not admin, do below
@@ -37,7 +37,6 @@ def handleAdminCommand(db: HydrangeaDatabase, socketClient: socket.socket, user,
                         socketClient.sendall(f"SUCCESS: User {userInputSplit[1]}({userInputSplit[3]}) created successfully".encode("utf-8"))
                     else:
                         socketClient.sendall(f"ERROR: Failed to create user '{userInputSplit[1]}'".encode("utf-8"))
-                    return True
 
             # Edit user's username
             elif userInput.startswith("editusername"): # editusername USERNAME NEW_USERNAME

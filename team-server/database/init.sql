@@ -10,3 +10,14 @@ CREATE TABLE users (
 
 -- default admin:admin user
 INSERT INTO users(username, password, role) VALUES('admin', '$2b$12$2ruRCpEiwlzER3keMvVTfeQyMrUcxqViiFmTG83ENAkpT.Os04kou', 'admin');
+
+-- tasks table
+CREATE TABLE tasks (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  originClientId VARCHAR(255) NOT NULL,
+  agentId VARCHAR(255) NOT NULL,
+  task TEXT NOT NULL,
+  output TEXT,
+  taskedAt INT NOT NULL, -- unix time (secs)
+  outputAt INT -- unix time (secs)
+);

@@ -1,7 +1,9 @@
 from threading import Thread
 from .socket_custom import SocketCustom
 from . import admin as adminFunc
-import bcrypt
+from . import task as taskFunc
+from . import auth as authFunc
+from . import listener as listenerFunc
 from database.database import HydrangeaDatabase
 
 class TeamServer():
@@ -31,25 +33,10 @@ class TeamServer():
         print(f"SUCCESS: Starting session from {addrClient[0]}:{addrClient[1]}")
 
         # Authentication
-        authData = socketClient.recvall()
-        username, password = map(lambda x: x.decode("utf-8"), authData.split(b"\x00"))
-
-        ## Validate username
-        user = self.db.getUserByUsername(username=username).first()
+        user = authFunc.handleAuth(db=self.db, socketClient=socketClient)
         if user is None:
-            socketClient.sendall(b"ERROR: User does not exist / incorrect auth")
-            socketClient.close()
             return
-
-        ## Validate password
-        passwordInDb = user.password
-        resultPasswordHashCheck = bcrypt.checkpw(password.encode("utf-8"), passwordInDb.encode("utf-8"))
-        if not resultPasswordHashCheck:
-            socketClient.sendall(b"ERROR: User does not exist / incorrect auth")
-            socketClient.close()
-            return
-        print(f"SUCCESS: User '{username}' logged in")
-        socketClient.sendall(b"SUCCESS: Logged in")
+        clientId = f"{user.username}-{addrClient[0]}:{addrClient[1]}"
 
         # Start client handling loop
         while True:
@@ -70,8 +57,12 @@ class TeamServer():
                 continue
 
             # If listener command, handle it and go back to start
+            if listenerFunc.handleListenerCommand(db=self.db, clientId=clientId, socketClient=socketClient, user=user, userInput=userInput):
+                continue
 
-            # If agent command, handle it and go back to start
+            # If task command, handle it and go back to start
+            if taskFunc.handleTaskCommand(db=self.db, clientId=clientId, socketClient=socketClient, user=user, userInput=userInput):
+                continue
 
             # Wrong command if execution reaches here
             socketClient.sendall(b"ERROR: Wrong command")
