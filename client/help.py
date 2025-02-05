@@ -5,9 +5,10 @@ This file contains help menu for client
 HELP_MAIN_MENU = """
 > MAIN CONTEXT
 
-COMMAND       : PURPOSE
------------------------
-context admin : Switches to administration context to manage team server
+COMMAND          : PURPOSE
+--------------------------
+context admin    : Switches to administration context to manage team server
+context listener : Switches to listeners context to control and query listeners
 
 quit/exit     : Quits client
 """
@@ -28,6 +29,15 @@ quit/exit/back                     : Go back to main context
 """
 
 HELP_CONTEXT_LISTENER = """
+COMMAND                    : PURPOSE
+------------------------------------
+
+listenernew TYPE HOST PORT : Creates a new listener; TYPE can be 'http'
+listenersget               : Get all running listeners
+listenerdel LISTENER_ID    : Stops a running listener
+"""
+
+HELP_CONTEXT_AGENT = """
 
 """
 

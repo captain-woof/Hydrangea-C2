@@ -13,9 +13,9 @@ class TeamServer():
     host: str
     port: int
     maxConns: int
-    sessions: dict # TODO
     db: HydrangeaDatabase
     socketServer: SocketCustom
+    listenersMap: dict # Listener_ID -> (LISTENER_LAUNCHER)
 
     ##########
     # Methods
@@ -27,6 +27,24 @@ class TeamServer():
         self.port = port
         self.maxConns = maxConns
         self.db = HydrangeaDatabase()
+        self.listenersMap = {}
+
+    # Register new listener
+    def registerListener(self, listenerId: str, listenerLauncher):
+        if self.listenersMap.get(listenerId) is None:
+            self.listenersMap[listenerId] = (listenerLauncher)
+            return True
+        else:
+            return False
+
+    # Remove existing listener
+    def removeListener(self, listenerId: str):
+        if self.listenersMap.get(listenerId) is None:
+            return False
+        else:
+            self.listenersMap[listenerId].stop()
+            del self.listenersMap[listenerId]
+            return True
 
     # Handle independent session in Thread
     def startSession(self, socketClient: SocketCustom, addrClient: tuple):
@@ -57,7 +75,7 @@ class TeamServer():
                 continue
 
             # If listener command, handle it and go back to start
-            if listenerFunc.handleListenerCommand(db=self.db, clientId=clientId, socketClient=socketClient, user=user, userInput=userInput):
+            if listenerFunc.handleListenerCommand(db=self.db, clientId=clientId, socketClient=socketClient, user=user, userInput=userInput, registerListener=self.registerListener, removeListener=self.removeListener, listenersMap=self.listenersMap):
                 continue
 
             # If task command, handle it and go back to start

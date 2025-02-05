@@ -64,6 +64,27 @@ class Client():
                             response = self.socketClient.recvall().decode("utf-8")
                             print(response)
 
+                # Handle listener functions
+                elif userInput == "context listener":
+                    # Listener functions loop
+                    while True:
+                        userInput = input(f"{username}@{self.host}:{self.port} > Listeners > ")
+                        # Print 'context admin' Help
+                        if userInput == "help":
+                            print(help.HELP_CONTEXT_LISTENER)
+                        # Go back from 'context admin'
+                        elif userInput in ["back", "quit", "exit"]:
+                            break
+                        # Send command to server
+                        else:
+                            self.socketClient.sendall(userInput.encode("utf-8"))
+                            response = self.socketClient.recvall().decode("utf-8")
+                            print(response)
+
+                # Handle payload functions
+
+                # Handle task functions
+
                 # Handle quit to exit client
                 elif userInput in ["quit", "exit"]:
                     self.socketClient.sendall(b"quit")
@@ -83,7 +104,7 @@ class Client():
                 else:
                     print("ERROR: Wrong command")
         except ConnectionRefusedError:
-            print("ERROR: Failed to connect with server. Is server running?")
+            print("ERROR: Failed to connect to server. Is server running?")
 
         except KeyboardInterrupt:
             print("SUCCESS: Quit")
