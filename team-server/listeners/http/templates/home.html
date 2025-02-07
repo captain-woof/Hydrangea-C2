@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Political Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>Political Insights</h1>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="latest-news">
+            <h2>Latest News</h2>
+            {% if latest_post %}
+            <article class="latest-post">
+                <picture>
+                    <source srcset="{{ latest_post.hero_image_base64 }}" type="image/png">
+                    <img src="{{ url_for('static', filename='images/politics-fallback.jpg') }}" alt="{{ latest_post.title }}" class="hero-image">
+                </picture>
+                <h3><a href="/politics/{{ latest_post.id }}">{{ latest_post.title }}</a></h3>
+                <p>{{ latest_post.content[0].text | truncate(200, True, '...') }}</p>
+                <a href="/politics/{{ latest_post.id }}" class="read-more">Read More</a>
+            </article>
+            {% else %}
+            <p>No posts yet.</p>
+            {% endif %}
+        </section>
+
+        <aside id="sidebar">
+            <h3>Recent Posts</h3>
+            <ul>
+                {% for post in other_recent_posts %}
+                <li><a href="/politics/{{ post.id }}">{{ post.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </aside>
+    </main>
+
+    <footer>
+        <p>© 2024 Political Insights</p>
+    </footer>
+</body>
+</html>

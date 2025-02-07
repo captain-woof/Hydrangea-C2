@@ -1,0 +1,20 @@
+{
+    "id": "presidential-candidates-face-off-in-heated-debate",
+    "title": "Presidential Candidates Face Off in Heated Debate",
+    "author": "Samuel O'Connell",
+    "author_image": "images/samuel-o-connell.jpeg",
+    "author_bio": "Samuel O'Connell is a political reporter covering the presidential campaign. He has been following the candidates on the campaign trail for months and has a keen sense of the dynamics of the race. Samuel is a graduate of the Columbia University School of Journalism and has worked for several leading news organizations. He is known for his fair and objective reporting and his ability to cut through the spin and get to the truth.",
+    "date": "2024-10-25",
+    "hero_image_fallback": "images/presidential-candidates-face-off-in-heated-debate.jpg",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "The leading presidential candidates clashed sharply on key policy issues during a heated debate last night. The debate, which was broadcast live on national television, covered a range of topics, including the economy, healthcare, and foreign policy."
+      },
+      {
+        "type": "paragraph",
+        "text": "The candidates traded barbs and challenged each other's records, offering voters a clear contrast in their visions for the country. Polls suggest that the debate may have shifted the dynamics of the race, with undecided voters now leaning towards one candidate or another."
+      }
+    ],
+    "related_posts": ["the-presidents-new-policy-a-deep-dive"]
+  }

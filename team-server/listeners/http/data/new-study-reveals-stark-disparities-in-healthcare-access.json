@@ -1,0 +1,20 @@
+{
+    "id": "new-study-reveals-stark-disparities-in-healthcare-access",
+    "title": "New Study Reveals Stark Disparities in Healthcare Access",
+    "author": "Priya Sharma",
+    "author_image": "images/priya-sharma.jpeg",
+    "author_bio": "Priya Sharma is a data journalist focusing on social and economic inequalities. She has expertise in analyzing large datasets to uncover trends and patterns. Priya holds a Ph.D. in sociology from the University of California, Berkeley. Her work often highlights disparities in healthcare, education, and housing. She is committed to using data to inform the public and advocate for policy changes that promote equity and opportunity.",
+    "date": "2024-10-23",
+    "hero_image_fallback": "images/new-study-reveals-stark-disparities-in-healthcare-access.jpg",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "A new study has revealed stark disparities in access to healthcare across different racial and socioeconomic groups. The study found that minority communities and low-income individuals are significantly less likely to have access to quality healthcare services."
+      },
+      {
+        "type": "paragraph",
+        "text": "The findings have reignited the debate over healthcare reform and the need to address systemic inequities in the healthcare system. Advocates are calling for policy changes to expand access to affordable healthcare for all Americans."
+      }
+    ],
+    "related_posts": ["the-presidents-new-policy-a-deep-dive"]
+  }

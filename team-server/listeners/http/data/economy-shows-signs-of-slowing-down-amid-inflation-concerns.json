@@ -1,0 +1,20 @@
+{
+    "id": "economy-shows-signs-of-slowing-down-amid-inflation-concerns",
+    "title": "Economy Shows Signs of Slowing Down Amid Inflation Concerns",
+    "author": "Marcus Lee",
+    "author_image": "images/marcus-lee.jpeg",
+    "author_bio": "Marcus Lee is an economics correspondent covering macroeconomic trends and fiscal policy. He has a deep understanding of financial markets and has reported on numerous economic crises and recoveries. Marcus holds an MBA from the Wharton School of the University of Pennsylvania. He is known for his insightful analysis and his ability to explain complex economic concepts in a clear and concise manner. Marcus is a regular commentator on business news channels and is often sought after for his expertise on economic forecasting.",
+    "date": "2024-10-22",
+    "hero_image_fallback": "images/economy-shows-signs-of-slowing-down-amid-inflation-concerns.jpg",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "The U.S. economy is showing signs of slowing down amid rising inflation and concerns about a potential recession. Recent economic data has revealed a decline in consumer spending and business investment."
+      },
+      {
+        "type": "paragraph",
+        "text": "The Federal Reserve is considering further interest rate hikes to combat inflation, but some economists worry that this could trigger a recession. The outlook for the economy remains uncertain as policymakers grapple with these challenges."
+      }
+    ],
+    "related_posts": ["the-presidents-new-policy-a-deep-dive"]
+  }

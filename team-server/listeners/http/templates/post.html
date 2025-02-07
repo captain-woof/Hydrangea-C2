@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }} - Political Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <h1>Political Insights</h1>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <article class="post">
+            <picture>
+                <img src="{{ url_for('static', filename=post.hero_image_fallback) }}" alt="{{ post.title }}" class="hero-image">
+                <source srcset="{{ post.hero_image_base64 }}" type="image/png">
+            </picture>
+
+            <h1>{{ post.title }}</h1>
+
+            <div class="author-info">
+                <img src="{{ url_for('static', filename=post.author_image) }}" alt="{{ post.author }}" class="author-image">
+                <div class="author-details">
+                    <p class="author-name">By {{ post.author }}</p>
+                    <p class="author-bio">{{ post.author_bio }}</p>
+                    <p class="published-date">Published on {{ post.date }}</p>
+                </div>
+            </div>
+
+
+            {% for item in post.content %}
+                {% if item.type == "paragraph" %}
+                    <p>{{ item.text }}</p>
+                {% elif item.type == "quote" %}
+                    <blockquote cite="#">
+                        <p>{{ item.text }}</p>
+                        <footer>- {{ item.author }}</footer>
+                    </blockquote>
+                {% endif %}
+            {% endfor %}
+        </article>
+    </main>
+
+    <footer>
+        <p>© 2024 Political Insights</p>
+    </footer>
+</body>
+</html>

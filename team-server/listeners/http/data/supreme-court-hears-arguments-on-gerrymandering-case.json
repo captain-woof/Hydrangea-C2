@@ -1,0 +1,20 @@
+{
+    "id": "supreme-court-hears-arguments-on-gerrymandering-case",
+    "title": "Supreme Court Hears Arguments on Gerrymandering Case",
+    "author": "Amelia Chen",
+    "author_image": "images/amelia-chen.jpeg",
+    "author_bio": "Amelia Chen is a legal correspondent covering the Supreme Court. She has a deep understanding of constitutional law and has reported on numerous landmark cases. Amelia holds a J.D. from Yale Law School and is a member of the Supreme Court bar. She is known for her insightful analysis and her ability to explain complex legal issues in a clear and accessible way. Amelia is a strong advocate for judicial transparency and believes that the public has a right to know how the Supreme Court is making its decisions.",
+    "date": "2024-10-26",
+    "hero_image_fallback": "images/supreme-court-hears-arguments-on-gerrymandering-case.jpg",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "The Supreme Court heard oral arguments today in a major case challenging the constitutionality of partisan gerrymandering. The case, brought by a group of voters in North Carolina, alleges that the state's congressional map was drawn to unfairly favor Republicans, violating the First and Fourteenth Amendments."
+      },
+      {
+        "type": "paragraph",
+        "text": "The justices appeared sharply divided during the arguments, with conservative justices expressing skepticism about the court's ability to resolve gerrymandering disputes and liberal justices raising concerns about the impact of partisan mapmaking on democracy. A ruling in the case is expected by the end of June."
+      }
+    ],
+    "related_posts": ["senate-approves-new-voting-rights-bill"]
+  }

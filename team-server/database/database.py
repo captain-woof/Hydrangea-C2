@@ -99,6 +99,40 @@ class HydrangeaDatabase():
         except SQLAlchemyError:
             return False
         
+    # Save agent information
+    def saveAgentInfo(self, agentId: str, host: str, username: str):
+        try:
+            with Session(db_engine) as session:
+                session.execute(
+                    text("INSERT INTO agents(id, host, username, lastCheckinAt) VALUES(:id, :host, :username, :lastCheckinAt)"),
+                    [{
+                        "id": agentId,
+                        "host": host,
+                        "username": username,
+                        "lastCheckinAt": int(time.time())
+                    }]
+                )
+                session.commit()
+            return True
+        except SQLAlchemyError:
+            return False
+        
+    # Update agent checkin timestamp
+    def updateAgentTimestamp(self, agentId: str):
+        try:
+            with Session(db_engine) as session:
+                session.execute(
+                    text("UPDATE agents SET lastCheckinAt = :lastCheckinAt WHERE id = :id"),
+                    [{
+                        "id": agentId,
+                        "lastCheckinAt": int(time.time())
+                    }]
+                )
+                session.commit()
+            return True
+        except SQLAlchemyError:
+            return False
+        
     # Create new task
     def createNewTask(self, originClientId: str, agentId: str, task: str):
         try:

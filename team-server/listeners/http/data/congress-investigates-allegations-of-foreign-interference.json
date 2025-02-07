@@ -1,0 +1,20 @@
+{
+    "id": "congress-investigates-allegations-of-foreign-interference",
+    "title": "Congress Investigates Allegations of Foreign Interference",
+    "author": "Javier Rodriguez",
+    "author_image": "images/javier-rodriguez.jpeg",
+    "author_bio": "Javier Rodriguez is an investigative reporter specializing in national security and foreign policy. He has extensive experience covering intelligence agencies and has cultivated sources within the government and the intelligence community. Javier holds a master's degree in International Relations from Johns Hopkins University. His reporting has been recognized with several prestigious awards, and he is considered a leading expert on issues of foreign interference and cybersecurity.",
+    "date": "2024-10-24",
+    "hero_image_fallback": "images/congress-investigates-allegations-of-foreign-interference.jpg",
+    "content": [
+      {
+        "type": "paragraph",
+        "text": "A congressional committee is investigating allegations of foreign interference in recent elections. The committee is examining evidence of potential coordination between foreign governments and political campaigns."
+      },
+      {
+        "type": "paragraph",
+        "text": "The investigation has already uncovered a number of troubling findings, and more revelations are expected in the coming weeks. The committee's report could have significant implications for the future of American democracy."
+      }
+    ],
+    "related_posts": ["presidential-candidates-face-off-in-heated-debate"]
+  }
