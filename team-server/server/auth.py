@@ -3,7 +3,7 @@ from .socket_custom import SocketCustom
 import bcrypt
 
 # Handles authentication
-def handleAuth(db: HydrangeaDatabase, socketClient: SocketCustom):
+def handleAuth(db: HydrangeaDatabase, socketClient: SocketCustom, addrClient: tuple):
     # Authentication
     authData = socketClient.recvall()
     username, password = map(lambda x: x.decode("utf-8"), authData.split(b"\x00"))
@@ -13,7 +13,7 @@ def handleAuth(db: HydrangeaDatabase, socketClient: SocketCustom):
     if user is None:
         socketClient.sendall(b"ERROR: User does not exist / incorrect auth")
         socketClient.close()
-        return None
+        return (None, None)
     
     ## Validate password
     passwordInDb = user.password
@@ -21,9 +21,12 @@ def handleAuth(db: HydrangeaDatabase, socketClient: SocketCustom):
     if not resultPasswordHashCheck:
         socketClient.sendall(b"ERROR: User does not exist / incorrect auth")
         socketClient.close()
-        return None
+        return (None, None)
+    
+    # Prepare client ID and send in response
+    clientId = f"{username}-{addrClient[0]}:{addrClient[1]}"
+    socketClient.sendall(f"SUCCESS: Logged in; clientId = '{clientId}'".encode("utf-8"))
     
     print(f"SUCCESS: User '{username}' logged in")
-    socketClient.sendall(b"SUCCESS: Logged in")
 
-    return user
+    return (user, clientId)

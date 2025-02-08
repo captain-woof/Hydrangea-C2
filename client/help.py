@@ -9,6 +9,7 @@ COMMAND          : PURPOSE
 --------------------------
 context admin    : Switches to administration context to manage team server
 context listener : Switches to listeners context to control and query listeners
+context agent    : Switches to agent context to control agents
 
 quit/exit     : Quits client
 """
@@ -38,7 +39,19 @@ listenerdel LISTENER_ID    : Stops a running listener
 """
 
 HELP_CONTEXT_AGENT = """
+COMMAND                : PURPOSE
+--------------------------------
 
+agentsget              : Gets all agents
+agentinteract AGENT_ID : Interact with agent
+agentstasksget         : Get all tasks of all agents
+"""
+
+HELP_CONTEXT_AGENT_CAPABILITIES = """
+COMMAND                : PURPOSE
+--------------------------------
+
+tasksget               : Get all tasks of the agent
 """
 
 HELP_CONTEXT_PAYLOAD = """

@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     # Start team server
     try:
-        teamServer = TeamServer(host=host, port=port, maxConns=20)
+        teamServer = TeamServer(host=host, port=port)
         teamServer.start()
     except KeyboardInterrupt:
         print("Quitting team server...")

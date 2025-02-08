@@ -99,6 +99,16 @@ class HydrangeaDatabase():
         except SQLAlchemyError:
             return False
         
+    # Get all agents
+    def getAllAgents(self):
+        try:
+            with Session(db_engine) as session:
+                return session.execute(
+                    text("SELECT * FROM agents")
+                ).fetchall()
+        except SQLAlchemyError:
+            return False
+        
     # Save agent information
     def saveAgentInfo(self, agentId: str, host: str, username: str):
         try:
@@ -193,6 +203,30 @@ class HydrangeaDatabase():
                             "agentId": agentId
                         }]
                     ).fetchall()
+        except SQLAlchemyError:
+            return False
+        
+    # Get all tasks initiated by particular client
+    def getTasksInitiatedByClient(self, clientId: str, taskIdTillWhichSynced, onlyTasksWithOutput = False):
+        try:
+            with Session(db_engine) as session:
+                if taskIdTillWhichSynced is None:
+                    return session.execute(
+                            text("SELECT * FROM tasks WHERE originClientId = :originClientId AND outputAt IS NOT NULL ORDER BY id ASC") if onlyTasksWithOutput
+                            else text("SELECT * FROM tasks WHERE originClientId = :originClientId ORDER BY id ASC"),
+                            [{
+                                "originClientId": clientId
+                            }]
+                        ).fetchall()
+                else:
+                    return session.execute(
+                            text("SELECT * FROM tasks WHERE originClientId = :originClientId AND id > :taskIdTillWhichSynced AND outputAt IS NOT NULL ORDER BY id ASC") if onlyTasksWithOutput
+                            else text("SELECT * FROM tasks WHERE originClientId = :originClientId AND id > :taskIdTillWhichSynced ORDER BY id ASC"),
+                            [{
+                                "originClientId": clientId,
+                                "taskIdTillWhichSynced": taskIdTillWhichSynced
+                            }]
+                        ).fetchall()
         except SQLAlchemyError:
             return False
 
