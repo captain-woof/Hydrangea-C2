@@ -30,6 +30,7 @@ def handleSubscriptionCommand(db: HydrangeaDatabase, socketClient: SocketCustom,
             while True:
                 # Check if subscription thread should stop
                 if clientIdToAgentsNotificationMap[clientId] == "stop" or clientIdToLatestTaskIdSyncedMap[clientId] == "stop":
+                    socketClient.sendall(f"SUCCESS: Publisher closing on Team server".encode("utf-8")) 
                     break
 
                 # Notify for all new agents

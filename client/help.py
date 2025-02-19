@@ -52,6 +52,8 @@ COMMAND                : PURPOSE
 --------------------------------
 
 tasksget               : Get all tasks of the agent
+messagebox TITLE BODY  : Show a messagebox on target
+exit                   : Agent exits on target
 """
 
 HELP_CONTEXT_PAYLOAD = """

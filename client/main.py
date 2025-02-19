@@ -14,6 +14,59 @@ def base64Encode(s: str):
 def base64Decode(s: str):
     return base64.b64decode(s.encode("utf-8")).decode("utf-8")
 
+def stringSplitAdvanced(strInput):
+    """
+    Splits a UTF-8 string by spaces, treating substrings enclosed in " or ' as single units.
+    Escaped quotes (\\", \\') within their respective quotes do not end the substring.
+
+    Args:
+        input_string: The UTF-8 string to split.
+
+    Returns:
+        A list of strings representing the split result.
+    """
+    result = []
+    current_word = ""
+    quote_type = None  # None, '"', or "'"
+    escape = False
+
+    for char in strInput:
+        if escape:
+            current_word += char
+            escape = False
+            continue
+
+        if char == '\\':
+            escape = True
+            continue
+
+        if quote_type:  # Inside a quote
+            if char == quote_type:
+                result.append(current_word)
+                current_word = ""
+                quote_type = None
+            else:
+                current_word += char
+        else:  # Not inside a quote
+            if char == ' ':
+                if current_word:  # Add word if it's not empty
+                    result.append(current_word)
+                    current_word = ""
+            elif char == '"':
+                quote_type = '"'
+                current_word = "" # Start a new word
+            elif char == "'":
+                quote_type = "'"
+                current_word = "" # Start a new word
+            else:
+                current_word += char
+
+    # Add the last word if any
+    if current_word:
+        result.append(current_word)
+
+    return result
+
 ########
 # CLIENT
 ########
@@ -38,7 +91,9 @@ class Client():
 
     # Close connection
     def exit(self, errorCode = 0):
-        print(self.sendAndReceiveFromTeamServer("quit"))
+        quitResponse = self.sendAndReceiveFromTeamServer("quit")
+        if quitResponse is not None:
+            print(quitResponse)
 
         if self.socketSubscriber is not None:
             self.socketSubscriber.close()
@@ -53,8 +108,13 @@ class Client():
     # Send interactive command and receive output from team-server
     def sendAndReceiveFromTeamServer(self, whatToSend):
         self.socketClient.sendall(whatToSend.encode("utf-8") if type(whatToSend) is str else whatToSend)
-        response = self.socketClient.recvall().decode("utf-8")
-        return response
+        response = self.socketClient.recvall()
+
+        if response is None:
+            return None
+        else:
+            responseDecoded = response.decode("utf-8")
+            return responseDecoded
     
     # Subscription handler
     def streamMessages(self, host: str, port: int, username: str, password: str, clientIdToSubscribeFor: str):
@@ -98,6 +158,8 @@ class Client():
             username = input("Username: ")
             password = input("Password: ")
             authResponse = self.sendAndReceiveFromTeamServer(username.encode("utf-8") + b"\x00" + password.encode("utf-8"))
+            if authResponse is None:
+                self.exit()
             print(authResponse)
             if authResponse.startswith("ERROR:"):
                 self.exit()
@@ -186,7 +248,7 @@ class Client():
                                         continue
 
                                     # Go back if needed
-                                    if userInput in ["back", "quit", "exit"]:
+                                    if userInput in ["back", "quit"]:
                                         break
 
                                     # Help
@@ -200,7 +262,10 @@ class Client():
                                     
                                     # Create new task for agent
                                     else:
-                                        dataToSend = f"tasknew {agentId} {base64Encode(userInput)}"
+                                        stringSplitAdvanced(userInput)
+                                        stringSplitAdvanced[0] = stringSplitAdvanced[0].upper() # Command name
+                                        taskByteEncoded = b"\x00".join(stringSplitAdvanced.map(lambda x: x.encode("utf-8"))) # b"COMMAND\x00PARAM1\x00PARAM2"
+                                        dataToSend = f"tasknew {agentId} {base64Encode(taskByteEncoded)}"
                                         print(self.sendAndReceiveFromTeamServer(dataToSend))
             
                             # Wrong command
@@ -224,6 +289,10 @@ class Client():
         except KeyboardInterrupt:
             self.exit()
             print("SUCCESS: Quit")
+
+        except Exception as e:
+            self.exit()
+            print("ERROR: Quitting due to error")
 
 ########
 # MAIN

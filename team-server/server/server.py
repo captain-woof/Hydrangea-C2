@@ -86,10 +86,14 @@ class TeamServer():
                             clientId=clientId,
                             socketClient=socketClient
                         )
-                        return
+                        break
 
                     # If subscription command, handle it. Upon exit, break loop
                     elif subscriptionFunc.handleSubscriptionCommand(db=self.db, socketClient=socketClient, user=user, userInput=userInput, clientIdToAgentsNotificationMap=self.clientIdToAgentsNotificationMap, clientIdToLatestTaskIdSyncedMap=self.clientIdToLatestTaskIdSyncedMap):
+                        self.closeClientConnection(
+                            clientId=clientId,
+                            socketClient=socketClient
+                        )
                         break
 
                     # If admin command, handle it and go back to start
