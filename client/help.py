@@ -1,62 +1,50 @@
+from utils import dictArrayToTable
+
 """
 This file contains help menu for client
 """
 
-HELP_MAIN_MENU = """
-> MAIN CONTEXT
+HELP_MAIN_MENU = dictArrayToTable([
+    {"COMMAND": "context admin", "ARGS": "", "DESCRIPTION": "Switches to administration context to manage team server"},
+    {"COMMAND": "context listener", "ARGS": "", "DESCRIPTION": "Switches to listeners context to control and query listeners"},
+    {"COMMAND": "context agent", "ARGS": "", "DESCRIPTION": "Switches to agent context to control agents"},
+    {"COMMAND": "quit/exit", "ARGS": "", "DESCRIPTION": "Disconnects from server and quits client"}
+])
 
-COMMAND          : PURPOSE
---------------------------
-context admin    : Switches to administration context to manage team server
-context listener : Switches to listeners context to control and query listeners
-context agent    : Switches to agent context to control agents
+HELP_CONTEXT_ADMIN = dictArrayToTable([
+    {"COMMAND": "cleartable", "ARGS": "TABLE_NAME", "DESCRIPTION": "Clears table (available: users, tasks, agents)"},
+    {"COMMAND": "newuser", "ARGS": "USERNAME PASSWORD ROLE", "DESCRIPTION": "Creates a new user; usernames are unique; roles can be admin, operator, observer"},
+    {"COMMAND": "editusername", "ARGS": "USERNAME NEW_USERNAME", "DESCRIPTION": "Edits an existing user's username; usernames are unique"},
+    {"COMMAND": "editpassword", "ARGS": "USERNAME NEW_PASSWORD", "DESCRIPTION": "Edits an existing user's password"},
+    {"COMMAND": "editrole", "ARGS": "USERNAME NEW_ROLE", "DESCRIPTION": "Edits an existing user's role; roles can be admin, operator, observer"},
+    {"COMMAND": "deluser", "ARGS": "USERNAME", "DESCRIPTION": "Deletes an existing user; this is permanent"},
+    {"COMMAND": "quit/exit/back", "ARGS": "", "DESCRIPTION": "Go back to main context"}
+])
 
-quit/exit     : Quits client
-"""
+HELP_CONTEXT_LISTENER = dictArrayToTable([
+    {"COMMAND": "listenernew", "ARGS": "TYPE HOST PORT", "DESCRIPTION": "Creates a new listener on Team server; TYPE can be 'http'"},
+    {"COMMAND": "listenersget", "ARGS": "", "DESCRIPTION": "Get all running listeners' IDs"},
+    {"COMMAND": "listenerdel", "ARGS": "LISTENER_ID", "DESCRIPTION": "Stops a running listener"},
+    {"COMMAND": "quit/exit/back", "ARGS": "", "DESCRIPTION": "Go back to main context"}
+])
 
-HELP_CONTEXT_ADMIN = """
-> ADMIN CONTEXT
+HELP_CONTEXT_AGENT = dictArrayToTable([
+    {"COMMAND": "agentsget", "ARGS": "", "DESCRIPTION": "Gets all agents"},
+    {"COMMAND": "agentinteract", "ARGS": "AGENT_ID", "DESCRIPTION": "Interact with agent"},
+    {"COMMAND": "agentstasksget", "ARGS": "", "DESCRIPTION": "Get all tasks of all agents"},
+    {"COMMAND": "quit/exit/back", "ARGS": "", "DESCRIPTION": "Go back to main context"}
+])
 
-COMMAND                            : PURPOSE
---------------------------------------------
+HELP_CONTEXT_AGENT_CAPABILITIES = dictArrayToTable([
+    {"COMMAND": "tasksget", "ARGS": "", "DESCRIPTION": "Get all tasks of the agent"},
+    {"COMMAND": "messagebox", "ARGS": "TITLE BODY", "DESCRIPTION": "Show and focus on messagebox on target"},
+    {"COMMAND": "exit", "ARGS": "", "DESCRIPTION": "Agent exits on target after finishing up on remaining tasks"},
+    {"COMMAND": "quit/back", "ARGS": "", "DESCRIPTION": "Go back to main context"}
+])
 
-cleartable TABLE_NAME              : Clears table (available: users, tasks, agents)
-newuser USERNAME PASSWORD ROLE     : Creates a new user; usernames are unique; roles can be "admin", "operator", "observer"
-editusername USERNAME NEW_USERNAME : Edits an existing user's username; usernames are unique
-editpassword USERNAME NEW_PASSWORD : Edits an existing user's password
-editrole USERNAME NEW_ROLE         : Edits an existing user's role; roles can be "admin", "operator", "observer"
-deluser USERNAME                   : Deletes an existing user; this is permanent
-
-quit/exit/back                     : Go back to main context
-"""
-
-HELP_CONTEXT_LISTENER = """
-COMMAND                    : PURPOSE
-------------------------------------
-
-listenernew TYPE HOST PORT : Creates a new listener; TYPE can be 'http'
-listenersget               : Get all running listeners
-listenerdel LISTENER_ID    : Stops a running listener
-"""
-
-HELP_CONTEXT_AGENT = """
-COMMAND                : PURPOSE
---------------------------------
-
-agentsget              : Gets all agents
-agentinteract AGENT_ID : Interact with agent
-agentstasksget         : Get all tasks of all agents
-"""
-
-HELP_CONTEXT_AGENT_CAPABILITIES = """
-COMMAND                : PURPOSE
---------------------------------
-
-tasksget               : Get all tasks of the agent
-messagebox TITLE BODY  : Show a messagebox on target
-exit                   : Agent exits on target
-"""
-
-HELP_CONTEXT_PAYLOAD = """
-
-"""
+HELP_CONTEXT_PAYLOAD = dictArrayToTable([
+    {"COMMAND": "", "ARGS": "", "DESCRIPTION": ""},
+    {"COMMAND": "", "ARGS": "", "DESCRIPTION": ""},
+    {"COMMAND": "", "ARGS": "", "DESCRIPTION": ""},
+    {"COMMAND": "", "ARGS": "", "DESCRIPTION": ""}
+])
