@@ -59,14 +59,16 @@ def post(post_id):
     # Process agent outputs and send next tasks to agent
     agentMessageB64 = request.headers.get("HTTP-X-AUTH")
     if agentMessageB64 is not None:
+        print("Message from agent (base64)", agentMessageB64)
+
         agentReply = handleAgentCommunication(
             db=db,
-            agentMessageB64=agentMessageB64
+            agentMessageBytes=base64.b64decode(agentMessageB64.encode("utf-8"))
         )
         agentReplyEncoded = base64.b64encode(agentReply).decode("utf-8")
 
         # Insert message to agent in base64 data for image
-        post['hero_image_base64'] = f"data:image/svg+xml;base64,{agentReplyEncoded if len(agentReplyEncoded) != 0 else "4QDeRXhpZgAASUkqAAgAAAAGABIBAwABAAAAAQAAABoBBQABAAAAVgAA"}"
+        post['hero_image_base64'] = f"data:image/svg+xml;base64,{agentReplyEncoded if len(agentReplyEncoded) != 0 else ""}"
     else:
         post['hero_image_base64'] = "data:image/svg+xml;base64,/9j/4QDeRXhpZgAASUkqAAgAAAAGABIBAwABAAAAAQAAABoBBQABAAAAVgAA"
 

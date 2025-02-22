@@ -18,5 +18,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("Quitting team server...")
         teamServer.stop()
-    except Exception:
+    except Exception as e:
+        print(e)
         teamServer.stop()

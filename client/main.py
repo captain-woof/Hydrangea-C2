@@ -1,71 +1,9 @@
 from argparse import ArgumentParser
 import help
 from socket_custom import SocketCustom
-import base64
 from threading import Thread
-
-#########
-# HELPERS
-#########
-
-def base64Encode(s: str):
-    return base64.b64encode(s.encode("utf-8")).decode("utf-8")
-
-def base64Decode(s: str):
-    return base64.b64decode(s.encode("utf-8")).decode("utf-8")
-
-def stringSplitAdvanced(strInput):
-    """
-    Splits a UTF-8 string by spaces, treating substrings enclosed in " or ' as single units.
-    Escaped quotes (\\", \\') within their respective quotes do not end the substring.
-
-    Args:
-        input_string: The UTF-8 string to split.
-
-    Returns:
-        A list of strings representing the split result.
-    """
-    result = []
-    current_word = ""
-    quote_type = None  # None, '"', or "'"
-    escape = False
-
-    for char in strInput:
-        if escape:
-            current_word += char
-            escape = False
-            continue
-
-        if char == '\\':
-            escape = True
-            continue
-
-        if quote_type:  # Inside a quote
-            if char == quote_type:
-                result.append(current_word)
-                current_word = ""
-                quote_type = None
-            else:
-                current_word += char
-        else:  # Not inside a quote
-            if char == ' ':
-                if current_word:  # Add word if it's not empty
-                    result.append(current_word)
-                    current_word = ""
-            elif char == '"':
-                quote_type = '"'
-                current_word = "" # Start a new word
-            elif char == "'":
-                quote_type = "'"
-                current_word = "" # Start a new word
-            else:
-                current_word += char
-
-    # Add the last word if any
-    if current_word:
-        result.append(current_word)
-
-    return result
+import json
+from utils import *
 
 ########
 # CLIENT
@@ -114,6 +52,44 @@ class Client():
             return None
         else:
             responseDecoded = response.decode("utf-8")
+
+            # If response is a JSON, show in table
+            try:
+                responseDecodedJson = json.loads(responseDecoded)
+
+                # If single json object, convert to array of json
+                if type(responseDecodedJson) == "dict":
+                    responseDecodedJson = [responseDecodedJson]
+
+                # If there are any base64 values, decode them in place
+                for rowIndex, row in enumerate(responseDecodedJson):
+                    for key,val in row.items():
+                        try:
+                            valB64Decoded = base64Decode(val)
+                            responseDecodedJson[rowIndex][key] = valB64Decoded
+                        except Exception:
+                            continue
+
+                # If there are any time-like values, convert them in place to readable format
+                for rowIndex, row in enumerate(responseDecodedJson):
+                    for key,val in row.items():
+                        if key not in ("taskedAt", "outputAt", "lastCheckinAt"):
+                            continue
+                        try:
+                            if val in (None, 0, "0"):
+                                responseDecodedJson[rowIndex][key] = ""
+                            else:
+                                valHumanReadableTime = convertUnixTimeToHumanReadable(val)                            
+                                responseDecodedJson[rowIndex][key] = valHumanReadableTime
+                        except Exception:
+                            continue          
+
+                # Create and put everything in a table
+                return dictArrayToTable(responseDecodedJson)
+            except Exception:
+                pass
+
+            # Else return as is
             return responseDecoded
     
     # Subscription handler
@@ -262,9 +238,9 @@ class Client():
                                     
                                     # Create new task for agent
                                     else:
-                                        stringSplitAdvanced(userInput)
-                                        stringSplitAdvanced[0] = stringSplitAdvanced[0].upper() # Command name
-                                        taskByteEncoded = b"\x00".join(stringSplitAdvanced.map(lambda x: x.encode("utf-8"))) # b"COMMAND\x00PARAM1\x00PARAM2"
+                                        userInputSplit = stringSplitAdvanced(userInput)
+                                        userInputSplit[0] = userInputSplit[0].upper() # Command name
+                                        taskByteEncoded = b"\x00".join(map(lambda x: x.encode("utf-8"), userInputSplit)) # b"COMMAND\x00PARAM1\x00PARAM2"
                                         dataToSend = f"tasknew {agentId} {base64Encode(taskByteEncoded)}"
                                         print(self.sendAndReceiveFromTeamServer(dataToSend))
             
@@ -291,8 +267,9 @@ class Client():
             print("SUCCESS: Quit")
 
         except Exception as e:
-            self.exit()
+            print(e)
             print("ERROR: Quitting due to error")
+            self.exit()
 
 ########
 # MAIN

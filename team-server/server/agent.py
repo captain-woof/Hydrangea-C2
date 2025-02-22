@@ -33,12 +33,14 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
     "lastCheckinAt": {agent.lastCheckinAt}
 }},"""
                     agentsDataJson = agentsDataJson.rstrip(",") + "\n]"
-                    socketClient.sendall(f"SUCCESS: {len(agents)} agents:\n{agentsDataJson}".encode("utf-8"))
+                    socketClient.sendall(agentsDataJson.encode("utf-8"))
                 else:
                     socketClient.sendall(f"ERROR: Failed to get all agents".encode("utf-8"))
         
         # Create new task
         if userInput.startswith("tasknew"): # tasknew AGENT_ID TASK_DATA_B64
+            print(userInputSplit[1], clientId, base64.b64decode(userInputSplit[2].encode("utf-8")).decode("utf-8"))
+
             if user.role not in ("operator", "admin"):
                 socketClient.sendall(b"ERROR: Unauthorized")
             elif len(userInputSplit) != 3:
@@ -63,9 +65,9 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
                     tasks = db.getTasks(agentId=userInputSplit[1])
                 else:
                     tasks = db.getTasks(agentId=None)
-                tasksToSend = "["
+                tasksToSendJson = "["
                 for task in tasks:
-                    tasksToSend += f"""
+                    tasksToSendJson += f"""
 {{
     "id": {task.id},
     "originClientId": "{task.originClientId}",
@@ -75,8 +77,8 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
     "taskedAt": {task.taskedAt if task.taskedAt is not None else 0},
     "outputAt": {task.outputAt if task.outputAt is not None else 0}
 }},"""
-                tasksToSend = tasksToSend.rstrip(",") + "\n]"
-                socketClient.sendall((f"SUCCESS: Tasks for agent '{userInputSplit[1]}':\n" + tasksToSend).encode("utf-8"))
+                tasksToSendJson = tasksToSendJson.rstrip(",") + "\n]"
+                socketClient.sendall(tasksToSendJson.encode("utf-8"))
 
         # Return true because command has been handled        
         return True
