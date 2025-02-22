@@ -48,7 +48,7 @@ class TeamServer():
             return True
         
     # Disconnect from client
-    def closeClientConnection(self, clientId: str, socketClient: SocketCustom):
+    def closeClientConnection(self, clientId: str, socketClient: SocketCustom, optionalMessage: bytes):
         # To quit publisher thread and subscriber client socket
         if clientId is not None:
             if self.clientIdToAgentsNotificationMap.get(clientId) is not None:
@@ -58,7 +58,7 @@ class TeamServer():
 
         # Close interactive client socket
         if socketClient is not None:
-            socketClient.sendall(b"SUCCESS: Bye from team server")
+            socketClient.sendall(optionalMessage if optionalMessage is not None else b"SUCCESS: Bye from team server")
             socketClient.close()
 
     # Handle independent session in Thread
@@ -114,13 +114,15 @@ class TeamServer():
                 print(e)
                 self.closeClientConnection(
                     clientId=clientId,
-                    socketClient=socketClient
+                    socketClient=socketClient,
+                    optionalMessage=str(e).encode("utf-8")
                 )
         except Exception as e:
             print(e)
             self.closeClientConnection(
                 clientId=None,
-                socketClient=socketClient
+                socketClient=socketClient,
+                optionalMessage=str(e).encode("utf-8")
             )
 
     # Stop server
