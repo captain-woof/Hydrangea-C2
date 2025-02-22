@@ -101,7 +101,7 @@ def stringSplitAdvanced(strInput):
 
     return result
 
-def dictArrayToTable(dictArray):
+def dictArrayToTable(dictArray, headerOrderList):
     """
     Converts an array of dictionaries to a formatted table string.
 
@@ -125,7 +125,7 @@ def dictArrayToTable(dictArray):
     # Validate that all elements are dictionaries and get keys from the first dictionary
     if not isinstance(dictArray[0], dict):
         raise TypeError("Input list must contain only dictionaries.")
-    expected_keys = set(dictArray[0].keys())
+    expected_keys = set(headerOrderList if headerOrderList is not None else dictArray[0].keys())
 
     for i in range(1, len(dictArray)):
         if not isinstance(dictArray[i], dict):
@@ -134,7 +134,7 @@ def dictArrayToTable(dictArray):
         if current_keys != expected_keys:
             raise ValueError("Dictionaries in the input array must have the same keys.")
 
-    headers = list(expected_keys)
+    headers = headerOrderList if headerOrderList is not None else list(expected_keys)
     column_widths = {}
 
     # Initialize column widths with header lengths
