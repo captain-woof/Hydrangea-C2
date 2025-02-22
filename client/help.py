@@ -20,6 +20,7 @@ HELP_CONTEXT_ADMIN = """
 COMMAND                            : PURPOSE
 --------------------------------------------
 
+cleartable TABLE_NAME              : Clears table (available: users, tasks, agents)
 newuser USERNAME PASSWORD ROLE     : Creates a new user; usernames are unique; roles can be "admin", "operator", "observer"
 editusername USERNAME NEW_USERNAME : Edits an existing user's username; usernames are unique
 editpassword USERNAME NEW_PASSWORD : Edits an existing user's password

@@ -17,6 +17,19 @@ db_engine = create_engine(f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{d
 
 # Database class; use for all operations
 class HydrangeaDatabase():
+    # Clear a table in database
+    def clearTable(self, tableToClear: str):
+        try:
+            # Delete table
+            with Session(db_engine) as session:
+                session.execute(
+                    text(f"DELETE FROM {tableToClear}")
+                )
+                session.commit()
+            return True
+        except SQLAlchemyError:
+            return False
+
     # Create a new user
     def createUser(self, username: str, passwordHash: str, role: str):
         try:

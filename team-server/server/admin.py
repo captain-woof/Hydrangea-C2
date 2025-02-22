@@ -8,7 +8,8 @@ ADMIN_COMMANDS_PREFIX = (
     "editusername",
     "editpassword",
     "editrole",
-    "deluser"
+    "deluser",
+    "cleartable"
 )
 
 # Hash password
@@ -28,8 +29,15 @@ def handleAdminCommand(db: HydrangeaDatabase, socketClient: SocketCustom, user, 
             # Split command
             userInputSplit = userInput.split(" ")
 
+            # Clear table
+            if userInput.startswith("cleartable"): # cleartable TABLE_NAME
+                if db.clearTable(tableToClear=userInputSplit[1]):
+                    socketClient.sendall(f"SUCCESS: Table '{userInputSplit[1]}' cleared".encode("utf-8"))
+                else:
+                    socketClient.sendall(f"ERROR: Failed to clear table '{userInputSplit[1]}'".encode("utf-8"))
+
             # New user
-            if userInput.startswith("newuser"): # newuser USERNAME PASSWORD ROLE
+            elif userInput.startswith("newuser"): # newuser USERNAME PASSWORD ROLE
                 if userInputSplit[3] not in ["admin", "operator", "observer"]:
                     socketClient.sendall(b"ERROR: Incorrect role")
                 else:    
