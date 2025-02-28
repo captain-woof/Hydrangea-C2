@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 import time
 import base64
+from ..server.utils import base64Decode, base64Encode, generateRandomStr
 
 # Load environment variables
 load_dotenv(".env")
@@ -189,7 +190,7 @@ class HydrangeaDatabase():
                 # Intervene - modify certain tasks
                 tasksFinal = []
                 for task in tasks:
-                    taskSplit: list[str] = task.task.split(" ")
+                    taskSplit: list[str] = task.task.split("\x00")
 
                     ## For upload, replace file path with file contents
                     if taskSplit[0] == "UPLOAD":
@@ -198,7 +199,7 @@ class HydrangeaDatabase():
                                 fileContent = fileToSend.read()
                                 fileContentB64 = base64.b64encode(fileContent).decode("utf-8")
                                 taskSplit[1] = fileContentB64
-                                task.task = " ".join(taskSplit)
+                                task.task = "\x00".join(taskSplit)
                                 tasksFinal.append(task)
                         except:
                             pass
@@ -268,19 +269,59 @@ class HydrangeaDatabase():
             return False
 
     # Set task output
-    def setTaskOutput(self, taskId: int, output: str):
+    def setTaskOutput(self, taskId: int, outputBytes: bytes):
         try:
             with Session(db_engine) as session:
-                session.execute(
-                    text("UPDATE tasks SET output = :output, outputAt = :outputAt WHERE id = :taskId"),
-                    [{
-                        "output": output,
-                        "outputAt": int(time.time()),
-                        "taskId": taskId
-                    }]
-                )
-                session.commit()
-            return True
+                # Get existing task to update
+                taskToUpdate = session.execute(
+                        text("SELECT * FROM tasks WHERE id = :taskId"),
+                        [{
+                            "taskId": taskId
+                        }]
+                    ).fetchone()
+                if taskToUpdate is not None:
+                    task = taskToUpdate.task
+                    taskSplit = task.split("\x00")
+                    outputToSave: None | str = None
+
+                    # Intervention
+
+                    ## For DOWNLOAD, save file content to disk and replace file contents by the saved file path
+                    if taskSplit[0] == "DOWNLOAD":
+                        ### Get filename
+                        filePathOnTarget = taskSplit[1]
+                        filePathOnTargetSplitByBackslash = filePathOnTarget.split("\\")
+                        filePathOnTargetSplitByFrontslash = filePathOnTarget.split("/")
+                        filename = None
+                        if len(filePathOnTargetSplitByBackslash) != 0:
+                            filename = filePathOnTargetSplitByBackslash[-1]
+                        elif len(filePathOnTargetSplitByFrontslash) != 0:
+                            filename = filePathOnTargetSplitByFrontslash[-1]
+                        else:
+                            filename = generateRandomStr(7)
+
+                        # Write file on server, then store pathname to it in database
+                        pathToSaveHereOnServer = os.path.join(os.getcwd(), "downloads", filename)
+                        with open(pathToSaveHereOnServer, "wb") as fileToSave:
+                            fileToSave.write(outputBytes)
+                        outputToSave = pathToSaveHereOnServer
+
+                    # For all other Tasks types, just save the Output data as is
+                    outputToSave = outputBytes.decode("utf-8")
+
+                    # Perform update
+                    session.execute(
+                        text("UPDATE tasks SET output = :output, outputAt = :outputAt WHERE id = :taskId"),
+                        [{
+                            "output": outputToSave,
+                            "outputAt": int(time.time()),
+                            "taskId": taskId
+                        }]
+                    )
+                    session.commit()
+
+                    return True
+                else:
+                    return False
         except SQLAlchemyError:
             return False
-

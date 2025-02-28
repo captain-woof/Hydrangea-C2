@@ -57,11 +57,15 @@ def handleSubscriptionCommand(db: HydrangeaDatabase, socketClient: SocketCustom,
                     clientIdToLatestTaskIdSyncedMap[clientId] = tasksToNotifyAbout[-1].id
                     notificationMessage = ""
                     for task in tasksToNotifyAbout:
-                        # Replace null-bytes in Task with space
-                        taskOriginal = task.task.encode("utf-8").replace(b"\x00", b" ").decode("utf-8")
+                        # Replace null-bytes in Task with space, making sure individual elements are quotation-enclosed
+                        taskSplit = task.task.split("\x00")
+                        for index,taskSplitIndividual in enumerate(taskSplit):
+                            if " " in taskSplitIndividual:
+                                taskSplit[index] = "\"" + taskSplitIndividual + "\""
+                        task.task = " ".join(taskSplit)
 
                         # Prepare notification for this Task
-                        notificationMessage += f"- Agent {task.agentId} [Task {task.id}]$ {taskOriginal}\n{task.output}\nCompleted {int(time()) - int(task.outputAt)} secs ago\n\n"
+                        notificationMessage += f"- Agent {task.agentId} [Task {task.id}]$ {task.task}\n{task.output}\nCompleted {int(time()) - int(task.outputAt)} secs ago\n\n"
                     socketClient.sendall(f"SUCCESS: New tasks output\n\n{notificationMessage}".encode("utf-8"))  
                 
                 # Sleep before checking for new messages to send

@@ -46,11 +46,11 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageBytes: bytes):
         ## Task output; "TASK_OUTPUT-12-base64(output)"
         elif agentMessageSplit[0] == "TASK_OUTPUT":
             taskId = agentMessageSplit[1]
-            output = base64.b64decode(agentMessageSplit[2].encode("utf-8")).decode("utf-8")
+            outputBytes = base64.b64decode(agentMessageSplit[2].encode("utf-8"))
 
             if db.setTaskOutput(
                 taskId=taskId,
-                output=output
+                outputBytes=outputBytes
             ):
                 print(f"SUCCESS: Saved output for Task ID '{taskId}'")
             else:

