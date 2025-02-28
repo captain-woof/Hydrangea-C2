@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 import time
 import base64
-from ..server.utils import base64Decode, base64Encode, generateRandomStr
+from .utils import base64Decode, base64Encode, generateRandomStr
 
 # Load environment variables
 load_dotenv(".env")

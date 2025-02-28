@@ -1,4 +1,4 @@
-from database.database import HydrangeaDatabase
+from .database import HydrangeaDatabase
 from .socket_custom import SocketCustom
 import bcrypt
 

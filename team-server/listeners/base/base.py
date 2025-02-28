@@ -1,5 +1,5 @@
 import base64
-from database.database import HydrangeaDatabase
+from server.database import HydrangeaDatabase
 
 # Function to handle communication with agent; takes input from agent and saves it, returns message for agent
 def handleAgentCommunication(db: HydrangeaDatabase, agentMessageBytes: bytes):

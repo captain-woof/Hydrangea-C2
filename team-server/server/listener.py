@@ -1,5 +1,5 @@
 from .socket_custom import SocketCustom
-from database.database import HydrangeaDatabase
+from .database import HydrangeaDatabase
 from listeners.http.launcher import HttpListenerLauncher
 
 # Constants

@@ -1,5 +1,5 @@
 from .socket_custom import SocketCustom
-from database.database import HydrangeaDatabase
+from .database import HydrangeaDatabase
 from .utils import base64Decode, base64Encode, generateRandomStr
 import os
 

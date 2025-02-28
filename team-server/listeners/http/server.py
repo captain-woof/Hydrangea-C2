@@ -1,5 +1,5 @@
 from flask import Flask, render_template, abort, request
-from database.database import HydrangeaDatabase
+from server.database import HydrangeaDatabase
 import json
 import os
 import base64

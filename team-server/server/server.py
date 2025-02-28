@@ -5,7 +5,7 @@ from . import agent as agentFunc
 from . import auth as authFunc
 from . import listener as listenerFunc
 from . import sub as subscriptionFunc
-from database.database import HydrangeaDatabase
+from .database import HydrangeaDatabase
 
 class TeamServer():
     ##########
