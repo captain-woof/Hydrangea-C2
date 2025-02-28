@@ -38,6 +38,15 @@ HELP_CONTEXT_AGENT = dictArrayToTable([
 HELP_CONTEXT_AGENT_CAPABILITIES = dictArrayToTable([
     {"COMMAND": "tasksget", "ARGS": "", "DESCRIPTION": "Get all tasks of the agent"},
     {"COMMAND": "messagebox", "ARGS": "TITLE BODY", "DESCRIPTION": "Show and focus on messagebox on target"},
+    {"COMMAND": "pwd", "ARGS": "", "DESCRIPTION": "Print current working directory"},
+    {"COMMAND": "cd", "ARGS": "DIR_PATH", "DESCRIPTION": "Change current working directory"},
+    {"COMMAND": "cp", "ARGS": "SRC DST", "DESCRIPTION": "Copy file/directory; if directory, copying is recursive"},
+    {"COMMAND": "mv", "ARGS": "SRC DST", "DESCRIPTION": "Move file/directory; if directory, moving is recursive"},
+    {"COMMAND": "rm", "ARGS": "PATH", "DESCRIPTION": "Delete file/directory; if directory, deletion is recursive"},
+    {"COMMAND": "ls", "ARGS": "PATH", "DESCRIPTION": "Show directory listing; includes everything"},
+    {"COMMAND": "icacls", "ARGS": "TYPE PATH", "DESCRIPTION": "Show security information about something; TYPE can be 'FILE'"},
+    {"COMMAND": "upload", "ARGS": "FILE_TO_UPLOAD WHERE_TO_UPLOAD", "DESCRIPTION": "Upload a file to target"},
+    {"COMMAND": "download", "ARGS": "PATH", "DESCRIPTION": "Download a file from target; file is saved on Team server"},
     {"COMMAND": "exit", "ARGS": "", "DESCRIPTION": "Agent exits on target after finishing up on remaining tasks"},
     {"COMMAND": "quit/back", "ARGS": "", "DESCRIPTION": "Go back to main context"}
 ], headerOrderList=["COMMAND", "ARGS", "DESCRIPTION"])
