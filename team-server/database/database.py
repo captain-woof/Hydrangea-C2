@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
 import time
+import base64
 
 # Load environment variables
 load_dotenv(".env")
@@ -177,6 +178,7 @@ class HydrangeaDatabase():
     def getNewTasksForAgent(self, agentId: str, setTasked: bool = False):
         try:
             with Session(db_engine) as session:
+                # Get tasks
                 tasks = session.execute(
                     text("SELECT * FROM tasks WHERE agentId = :agentId AND taskedAt IS NULL"),
                     [{
@@ -184,6 +186,28 @@ class HydrangeaDatabase():
                     }]
                 ).fetchall()
 
+                # Intervene - modify certain tasks
+                tasksFinal = []
+                for task in tasks:
+                    taskSplit: list[str] = task.task.split(" ")
+
+                    ## For upload, replace file path with file contents
+                    if taskSplit[0] == "UPLOAD":
+                        try:
+                            with open(taskSplit[1], "rb") as fileToSend:
+                                fileContent = fileToSend.read()
+                                fileContentB64 = base64.b64encode(fileContent).decode("utf-8")
+                                taskSplit[1] = fileContentB64
+                                task.task = " ".join(taskSplit)
+                                tasksFinal.append(task)
+                        except:
+                            pass
+
+                    ## For all other tasks, just pass through
+                    else:
+                        tasksFinal.append(task)
+
+                # Update taskedAt timestamp
                 if setTasked:
                     session.execute(
                         text("UPDATE tasks SET taskedAt = :taskedAt WHERE agentId = :agentId AND taskedAt IS NULL"),
@@ -194,7 +218,7 @@ class HydrangeaDatabase():
                     )
                     session.commit()
 
-                return tasks
+                return tasksFinal
         except SQLAlchemyError:
             return False
         

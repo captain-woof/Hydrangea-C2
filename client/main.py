@@ -64,6 +64,8 @@ class Client():
                 # If there are any base64 values, decode them in place
                 for rowIndex, row in enumerate(responseDecodedJson):
                     for key,val in row.items():
+                        if key not in ("taskB64", "outputB64"):
+                            continue
                         try:
                             valB64Decoded = base64Decode(val)
                             responseDecodedJson[rowIndex][key] = valB64Decoded
@@ -239,7 +241,26 @@ class Client():
                                     # Create new task for agent
                                     else:
                                         userInputSplit = stringSplitAdvanced(userInput)
+
+                                        # Uppercase task type
                                         userInputSplit[0] = userInputSplit[0].upper() # Command name
+
+                                        # Intervention
+
+                                        ## For upload file, replace file path with base64 of file content
+                                        if userInputSplit[0] == "UPLOAD":
+                                            fileToSendPath = userInputSplit[1]
+                                            try:
+                                                with open(fileToSendPath, "rb") as fileToSend:
+                                                    fileToSendContentB64 = base64Encode(fileToSend.read())
+                                                    userInputSplit[1] = fileToSendContentB64
+                                            except FileNotFoundError:
+                                                print(f"ERROR: '{fileToSendPath}' does not exist")
+                                                continue
+                                            except Exception as e:
+                                                print(f"ERROR:", e)
+                                                continue
+
                                         taskByteEncoded = b"\x00".join(map(lambda x: x.encode("utf-8"), userInputSplit)) # b"COMMAND\x00PARAM1\x00PARAM2"
                                         dataToSend = f"tasknew {agentId} {base64Encode(taskByteEncoded)}"
                                         print(self.sendAndReceiveFromTeamServer(dataToSend))

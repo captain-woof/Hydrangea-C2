@@ -37,10 +37,11 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageBytes: bytes):
                 agentId=agentMessageSplit[1],
                 setTasked=True
             )
-            for taskNew in tasksNew:
-                taskId = taskNew.id
-                taskB64Encoded = base64.b64encode(taskNew.task.encode("utf-8")).decode("utf-8")
-                agentReplyArray.append(f"TASK-{agentMessageSplit[1]}-{taskId}-{taskB64Encoded}") # TASK-123ABC-14-base64(input)
+            if tasksNew != False:
+                for taskNew in tasksNew:
+                    taskId = taskNew.id
+                    taskB64Encoded = base64.b64encode(taskNew.task.encode("utf-8")).decode("utf-8")
+                    agentReplyArray.append(f"TASK-{agentMessageSplit[1]}-{taskId}-{taskB64Encoded}") # TASK-123ABC-14-base64(input)
 
         ## Task output; "TASK_OUTPUT-12-base64(output)"
         elif agentMessageSplit[0] == "TASK_OUTPUT":
