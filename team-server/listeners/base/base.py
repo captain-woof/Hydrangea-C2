@@ -59,7 +59,7 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageBytes: bytes):
 
     # Prepare reply to send to Agent
     agentReplyArray = map(lambda x: x.encode("utf-8"), agentReplyArray)
-    agentReplyBytes = b"\x00".join(agentReplyArray)
+    agentReplyBytes = b"\x00".join(agentReplyArray) + b"\x00" # Null-separated array
 
     # Log message for Team server
     print("Agent reply", agentReplyBytes)
