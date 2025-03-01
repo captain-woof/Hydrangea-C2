@@ -101,7 +101,7 @@ def stringSplitAdvanced(strInput):
 
     return result
 
-def dictArrayToTable(dictArray, headerOrderList):
+def dictArrayToTable(dictArray, headerOrderList = None):
     """
     Converts an array of dictionaries to a formatted table string.
 

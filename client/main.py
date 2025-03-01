@@ -58,7 +58,7 @@ class Client():
                 responseDecodedJson = json.loads(responseDecoded)
 
                 # If single json object, convert to array of json
-                if type(responseDecodedJson) == "dict":
+                if isinstance(responseDecodedJson, dict):
                     responseDecodedJson = [responseDecodedJson]
 
                 # If there are any base64 values, decode them in place
