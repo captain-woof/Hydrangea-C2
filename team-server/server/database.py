@@ -199,8 +199,17 @@ class HydrangeaDatabase():
                                 fileContent = fileToSend.read()
                                 fileContentB64 = base64.b64encode(fileContent).decode("utf-8")
                                 taskSplit[1] = fileContentB64
-                                task.task = "\x00".join(taskSplit)
-                                tasksFinal.append(task)
+                                taskProcessed = "\x00".join(taskSplit)
+
+                                tasksFinal.append({
+                                    "id": task.id,
+                                    "originClientId": task.originClientId,
+                                    "agentId": task.agentId,
+                                    "task": taskProcessed,
+                                    "output": task.output,
+                                    "taskedAt": task.taskedAt,
+                                    "outputAt": task.outputAt,
+                                })
                         except:
                             pass
 
@@ -282,7 +291,7 @@ class HydrangeaDatabase():
                 if taskToUpdate is not None:
                     task = taskToUpdate.task
                     taskSplit = task.split("\x00")
-                    outputToSave: None | str = None
+                    outputToSave = ""
 
                     # Intervention
 
@@ -307,7 +316,8 @@ class HydrangeaDatabase():
                         outputToSave = pathToSaveHereOnServer
 
                     # For all other Tasks types, just save the Output data as is
-                    outputToSave = outputBytes.decode("utf-8")
+                    else:
+                        outputToSave = outputBytes.decode("utf-8")
 
                     # Perform update
                     session.execute(

@@ -1,6 +1,7 @@
 from .database import HydrangeaDatabase
 from .socket_custom import SocketCustom
 from time import sleep, time
+from .utils import convertUnixTimeToHumanReadable
 
 # Constants
 SUBSCRIPTION_COMMANDS_PREFIX = (
@@ -62,10 +63,10 @@ def handleSubscriptionCommand(db: HydrangeaDatabase, socketClient: SocketCustom,
                         for index,taskSplitIndividual in enumerate(taskSplit):
                             if " " in taskSplitIndividual:
                                 taskSplit[index] = "\"" + taskSplitIndividual + "\""
-                        task.task = " ".join(taskSplit)
+                        taskProcessed = " ".join(taskSplit)
 
                         # Prepare notification for this Task
-                        notificationMessage += f"- Agent {task.agentId} [Task {task.id}]$ {task.task}\n{task.output}\nCompleted {int(time()) - int(task.outputAt)} secs ago\n\n"
+                        notificationMessage += f"- Agent {task.agentId} [Task {task.id}]$ {taskProcessed}\n{task.output}\nCompleted at {convertUnixTimeToHumanReadable(task.outputAt)}\n\n"
                     socketClient.sendall(f"SUCCESS: New tasks output\n\n{notificationMessage}".encode("utf-8"))  
                 
                 # Sleep before checking for new messages to send
