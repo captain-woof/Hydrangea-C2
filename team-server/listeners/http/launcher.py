@@ -31,7 +31,7 @@ class HttpListenerLauncher:
             try:
                 # Create and start process
                 self.process = subprocess.Popen(
-                    ["gunicorn", "-w", f"{self.workersNum}", "-b", f"{self.host}:{self.port}", "--chdir", os.path.join(os.path.abspath(os.path.curdir), "listeners", "http"), "server:app"],
+                    ["gunicorn", "-w", f"{self.workersNum}", "-b", f"{self.host}:{self.port}", "--chdir", os.path.join(os.path.abspath(os.path.curdir), "listeners", "http"), "http_server:app"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     env=os.environ
