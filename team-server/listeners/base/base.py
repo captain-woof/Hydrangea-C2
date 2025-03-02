@@ -33,6 +33,10 @@ def handleAgentCommunication(db: HydrangeaDatabase, agentMessageBytes: bytes):
 
         ## Get tasks for particular agent; "GET_TASKS-123ABC"
         elif agentMessageSplit[0] == "GET_TASKS":
+            ### Update Agent check in timestamp
+            db.updateAgentTimestamp(agentId=agentMessageSplit[1])
+
+            ### Get tasks
             tasksNew = db.getNewTasksForAgent(
                 agentId=agentMessageSplit[1],
                 setTasked=True
