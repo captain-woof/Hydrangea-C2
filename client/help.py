@@ -44,7 +44,7 @@ HELP_CONTEXT_AGENT_CAPABILITIES = dictArrayToTable([
     {"COMMAND": "mv", "ARGS": "SRC DST", "DESCRIPTION": "Move file/directory; if directory, moving is recursive"},
     {"COMMAND": "rm", "ARGS": "PATH", "DESCRIPTION": "Delete file/directory; if directory, deletion is recursive"},
     {"COMMAND": "ls", "ARGS": "PATH", "DESCRIPTION": "Show directory listing; includes everything"},
-    {"COMMAND": "icacls", "ARGS": "TYPE PATH", "DESCRIPTION": "Show security information about something; TYPE can be 'FILE'"},
+    {"COMMAND": "icacls_file", "ARGS": "PATH", "DESCRIPTION": "Show security information of a file"},
     {"COMMAND": "upload", "ARGS": "FILE_TO_UPLOAD WHERE_TO_UPLOAD", "DESCRIPTION": "Upload a file to target"},
     {"COMMAND": "download", "ARGS": "PATH", "DESCRIPTION": "Download a file from target; file is saved on Team server"},
     {"COMMAND": "exit", "ARGS": "", "DESCRIPTION": "Agent exits on target after finishing up on remaining tasks"},
