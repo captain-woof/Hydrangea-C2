@@ -47,6 +47,8 @@ HELP_CONTEXT_AGENT_CAPABILITIES = dictArrayToTable([
     {"COMMAND": "icacls_file", "ARGS": "PATH", "DESCRIPTION": "Show security information of a file"},
     {"COMMAND": "upload", "ARGS": "FILE_TO_UPLOAD WHERE_TO_UPLOAD", "DESCRIPTION": "Upload a file to target"},
     {"COMMAND": "download", "ARGS": "PATH", "DESCRIPTION": "Download a file from target; file is saved on Team server"},
+    {"COMMAND": "mkdir", "ARGS": "DIR_NAME", "DESCRIPTION": "Create a new directory"},
+    {"COMMAND": "cat", "ARGS": "FILE_PATH", "DESCRIPTION": "Read a file's contents"},
     {"COMMAND": "exit", "ARGS": "", "DESCRIPTION": "Agent exits on target after finishing up on remaining tasks"},
     {"COMMAND": "quit/back", "ARGS": "", "DESCRIPTION": "Go back to main context"}
 ], headerOrderList=["COMMAND", "ARGS", "DESCRIPTION"])
