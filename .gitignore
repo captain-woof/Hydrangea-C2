@@ -3,3 +3,5 @@ notes.txt
 **/*/.env
 **/*/*.pyc
 **/*/__pycache__
+team-server/uploads/**/*
+team-server/downloads/**/*

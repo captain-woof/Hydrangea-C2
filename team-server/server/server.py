@@ -6,6 +6,7 @@ from . import auth as authFunc
 from . import listener as listenerFunc
 from . import sub as subscriptionFunc
 from .database import HydrangeaDatabase
+import os
 
 class TeamServer():
     ##########
@@ -18,6 +19,8 @@ class TeamServer():
     listenersMap: dict # Listener_ID -> (LISTENER_LAUNCHER)
     clientIdToAgentsNotificationMap = {} # clientId -> [agentId1, agentId2]
     clientIdToLatestTaskIdSyncedMap = {} # clientId -> TASK_ID; since task ids are sequential, this helps to filter for new tasks
+    directoryDownloads: str
+    directoryUploads: str
 
     ##########
     # Methods
@@ -25,9 +28,11 @@ class TeamServer():
 
     # Constructor
     def __init__(self, host: str = "127.0.0.1", port: int = 6060):
+        self.directoryUploads = os.path.join(os.getcwd(), "uploads")
+        self.directoryDownloads = os.path.join(os.getcwd(), "downloads")
         self.host = host
         self.port = port
-        self.db = HydrangeaDatabase()
+        self.db = HydrangeaDatabase(directoryDownloads=self.directoryDownloads, directoryUploads=self.directoryUploads)
         self.listenersMap = {}
 
     # Register new listener
@@ -101,7 +106,7 @@ class TeamServer():
                         continue
 
                     # If listener command, handle it and go back to start
-                    elif listenerFunc.handleListenerCommand(db=self.db, clientId=clientId, socketClient=socketClient, user=user, userInput=userInput, registerListener=self.registerListener, removeListener=self.removeListener, listenersMap=self.listenersMap):
+                    elif listenerFunc.handleListenerCommand(db=self.db, clientId=clientId, socketClient=socketClient, user=user, userInput=userInput, registerListener=self.registerListener, removeListener=self.removeListener, listenersMap=self.listenersMap, directoryDownloads=self.directoryDownloads, directoryUploads=self.directoryUploads):
                         continue
 
                     # If agent command, handle it and go back to start
@@ -138,6 +143,12 @@ class TeamServer():
 
     # Start server
     def start(self):
+        # Create Uploads and Downloads directory
+        if not os.path.exists(self.directoryUploads):
+            os.mkdir(self.directoryUploads)
+        if not os.path.exists(self.directoryDownloads):
+            os.mkdir(self.directoryDownloads)
+
         # Initialise server socket
         self.socketServer = SocketCustom()
         self.socketServer.bind((self.host, self.port))

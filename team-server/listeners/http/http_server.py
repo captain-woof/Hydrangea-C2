@@ -6,7 +6,10 @@ import base64
 from listeners.base import handleAgentCommunication
 
 # Database
-db = HydrangeaDatabase()
+db = HydrangeaDatabase(
+    directoryUploads=os.environ["DIRECTORY_UPLOADS"],
+    directoryDownloads=os.environ["DIRECTORY_DOWNLOADS"]
+)
 
 # Flask WSGI app
 app = Flask(__name__)

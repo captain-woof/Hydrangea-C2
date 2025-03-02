@@ -15,10 +15,19 @@ db_user = os.environ["MYSQL_USER"]
 db_password = os.environ["MYSQL_PASSWORD"]
 db_database = os.environ["MYSQL_DATABASE"]
 db_host = os.environ["MYSQL_HOST"]
-db_engine = create_engine(f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_database}", echo=True)
+db_engine = create_engine(f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_database}", echo=False)
 
 # Database class; use for all operations
 class HydrangeaDatabase():
+    # Member data
+    directoryUploads: str
+    directoryDownloads: str
+
+    # Constructor
+    def __init__(self, directoryUploads: str, directoryDownloads: str):
+        self.directoryUploads = directoryUploads
+        self.directoryDownloads = directoryDownloads
+
     # Clear a table in database
     def clearTable(self, tableToClear: str):
         try:
@@ -162,6 +171,31 @@ class HydrangeaDatabase():
     def createNewTask(self, originClientId: str, agentId: str, task: str):
         try:
             with Session(db_engine) as session:
+                # Intervention - pre-process specific Task types
+                taskSplit = task.split("\x00")
+                taskType = taskSplit[0]
+
+                ## For file upload, save the file on Team server, and store file path to it in Database
+                if taskType == "UPLOAD":
+                    # Get filename
+                    filePathOnTarget = taskSplit[2]
+                    filePathOnTargetSplitByBackslash = filePathOnTarget.split("\\")
+                    filePathOnTargetSplitByFrontslash = filePathOnTarget.split("/")
+                    filename = None
+                    if len(filePathOnTargetSplitByBackslash) != 0:
+                        filename = filePathOnTargetSplitByBackslash[-1]
+                    elif len(filePathOnTargetSplitByFrontslash) != 0:
+                        filename = filePathOnTargetSplitByFrontslash[-1]
+                    else:
+                        filename = generateRandomStr(7)
+
+                    # Write file on server, then store pathname to it in database
+                    pathToSaveHereOnServer = os.path.join(self.directoryUploads, filename)
+                    with open(pathToSaveHereOnServer, "wb+") as fileToSave:
+                        fileToSave.write(base64Decode(taskSplit[1], outputString=False))
+                    taskSplit[1] = pathToSaveHereOnServer
+                    task = "\x00".join(taskSplit)
+
                 session.execute(
                     text("INSERT INTO tasks(originClientId, agentId, task) VALUES(:originClientId, :agentId, :task)"),
                     [{
@@ -188,7 +222,7 @@ class HydrangeaDatabase():
                 ).fetchall()
 
                 # Intervene - modify certain tasks
-                tasksFinal = []
+                tasksFinal: list[dict] = []
                 for task in tasks:
                     taskSplit: list[str] = task.task.split("\x00")
 
@@ -210,12 +244,21 @@ class HydrangeaDatabase():
                                     "taskedAt": task.taskedAt,
                                     "outputAt": task.outputAt,
                                 })
-                        except:
+                        except Exception as e:
+                            print(e)
                             pass
 
                     ## For all other tasks, just pass through
                     else:
-                        tasksFinal.append(task)
+                        tasksFinal.append({
+                            "id": task.id,
+                            "originClientId": task.originClientId,
+                            "agentId": task.agentId,
+                            "task": task.task,
+                            "output": task.output,
+                            "taskedAt": task.taskedAt,
+                            "outputAt": task.outputAt,
+                        })
 
                 # Update taskedAt timestamp
                 if setTasked:
@@ -309,13 +352,13 @@ class HydrangeaDatabase():
                         else:
                             filename = generateRandomStr(7)
 
-                        # Write file on server, then store pathname to it in database
-                        pathToSaveHereOnServer = os.path.join(os.getcwd(), "downloads", filename)
-                        with open(pathToSaveHereOnServer, "wb") as fileToSave:
+                        ### Write file on server, then store pathname to it in database
+                        pathToSaveHereOnServer = os.path.join(self.directoryDownloads, filename)
+                        with open(pathToSaveHereOnServer, "wb+") as fileToSave:
                             fileToSave.write(outputBytes)
                         outputToSave = pathToSaveHereOnServer
 
-                    # For all other Tasks types, just save the Output data as is
+                    ## For all other Tasks types, just save the Output data as is
                     else:
                         outputToSave = outputBytes.decode("utf-8")
 

@@ -10,7 +10,7 @@ LISTENER_COMMANDS_PREFIX = (
 )
 
 # Handles Listener command; returns False if the input command is not a Task command
-def handleListenerCommand(db: HydrangeaDatabase, socketClient: SocketCustom, clientId: str, user, userInput: str, registerListener, removeListener, listenersMap: dict):
+def handleListenerCommand(db: HydrangeaDatabase, socketClient: SocketCustom, clientId: str, user, userInput: str, registerListener, removeListener, listenersMap: dict, directoryDownloads: str, directoryUploads: str):
     # If command is for Listener, handle here
     if userInput.startswith(LISTENER_COMMANDS_PREFIX):
         # Check role
@@ -34,7 +34,9 @@ def handleListenerCommand(db: HydrangeaDatabase, socketClient: SocketCustom, cli
                         httpListenerLauncher = HttpListenerLauncher(
                             host=userInputSplit[2],
                             port=int(userInputSplit[3]),
-                            workersNum=1
+                            workersNum=1,
+                            directoryUploads=directoryUploads,
+                            directoryDownloads=directoryDownloads
                         )
                         if not httpListenerLauncher.start(streamOutput=True):
                             socketClient.sendall(f"ERROR: Failed to start HTTP listener process for '{listenerId}'".encode("utf-8"))

@@ -11,12 +11,16 @@ class HttpListenerLauncher:
     process: subprocess.Popen
     workersNum: int
     threadOutputStreamer: Thread
+    directoryUploads: str
+    directoryDownloads: str
 
-    def __init__(self, host="127.0.0.1", port=8000, workersNum = 1):
+    def __init__(self, directoryDownloads, directoryUploads, host="127.0.0.1", port=8000, workersNum = 1):
         self.host = host
         self.port = port
         self.process = None
         self.workersNum = workersNum
+        self.directoryDownloads = directoryDownloads
+        self.directoryUploads = directoryUploads
 
     def streamProcessOutput(self):
         while True:
@@ -29,12 +33,20 @@ class HttpListenerLauncher:
         """Starts listener Gunicorn server as a subprocess and immediately returns."""
         if self.process is None:
             try:
+                # Prepare environment variables
+                envVarMap = {}
+                envVarMap.update(os.environ)
+                envVarMap.update({
+                    "DIRECTORY_DOWNLOADS": self.directoryDownloads,
+                    "DIRECTORY_UPLOADS": self.directoryUploads
+                })
+                
                 # Create and start process
                 self.process = subprocess.Popen(
                     ["gunicorn", "-w", f"{self.workersNum}", "-b", f"{self.host}:{self.port}", "--chdir", os.path.join(os.path.abspath(os.path.curdir), "listeners", "http"), "http_server:app"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
-                    env=os.environ
+                    env=envVarMap
                 )
 
                 # Start output streaming if necessary
